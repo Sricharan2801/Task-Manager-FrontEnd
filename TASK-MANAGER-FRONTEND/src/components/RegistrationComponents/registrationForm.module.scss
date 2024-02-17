@@ -1,0 +1,124 @@
+.main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    font-family: open sans;
+
+    .leftSection {
+        width: 60%;
+        height: 100%;
+        background-color: rgba(23, 162, 184, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .image {
+            width: 40%;
+        }
+
+        .caption {
+            color: rgba(255, 255, 255, 1);
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: absolute;
+            top: 70%;
+            left: 20%;
+
+        }
+
+        .internalText {
+            font-weight: 400;
+            font-size: 0.8rem;
+            padding-left: 38px;
+        }
+    }
+
+    .rightSection {
+        width: 40%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5%;
+
+        .heading {
+            color: rgba(52, 52, 52, 1);
+            font-weight: 600;
+            font-size: 2rem;
+        }
+
+        .form {
+            width: 70%;
+            height: 30%;
+
+            .fieldsContainer {
+                width: 100%;
+                height: 20%;
+                display: flex;
+                align-items: center;
+                gap: 2%;
+                border: 1px solid rgba(208, 208, 208, 1);
+                border-radius: 5px;
+                color: rgba(130, 130, 130, 1);
+                margin-top: 2.5%;
+
+                .icon {
+                    width: 25px;
+                    height: 25px;
+                    
+                }
+
+
+                .formFields {
+                    width: 80%;
+                    height: 80%;
+                    border: none;
+                    outline: none;
+                }
+            }
+
+
+        }
+
+        .buttons {
+            width: 80%;
+            height: 30%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+
+            .btn {
+                width: 90%;
+                height: 20%;
+                border-radius: 20px;
+                font-size: 0.8rem;
+            }
+
+            #registerBtn {
+                background-color: rgba(23, 162, 184, 1);
+                color: white
+            }
+
+            .text {
+                color: rgba(130, 130, 130, 1);
+                font-weight: 400;
+                font-size: 1rem;
+            }
+
+            #loginBtn {
+                background-color: white;
+                color: rgba(23, 162, 184, 1);
+                border: 1px solid rgba(23, 162, 184, 1);
+            }
+
+            #loginBtn:hover {
+                background-color: rgba(23, 162, 184, 1);
+                color: white;
+                border: none;
+            }
+        }
+    }
+}
