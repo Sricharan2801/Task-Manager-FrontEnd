@@ -13,16 +13,15 @@ export const userRegistration = async ({ name, email, password, confirmPassword 
         const response = await axios.post(requestUrl, requestPayLoad);
         return response.data;
 
-
     } catch (error) {
-        console.log("Internal Server Error", error);
-
         if (error.response.data.errorMessage === "Email already exist") {
             return toast("Email already exist!!")
         }
 
+        if (error.response.data.errorMessage === "password and confirm-password should be same") {
+            return toast("password and confirm-password should be same")
+        }
     }
-
 }
 
 export const userAuthentication = async ({ email, password }) => {
@@ -34,11 +33,32 @@ export const userAuthentication = async ({ email, password }) => {
         const response = await axios.post(requestUrl, requestPayLoad)
         return response.data
     } catch (error) {
-        console.log("Internal Server Error");
-
         if (error.response.data.errorMessage === "User Not Found") return toast("User Name Not Found");
         if (error.response.data.errorMessage === "Incorrect Password") return toast("Incorrect Password");
-
     }
 }
 
+export const updateUserData = async ({ name, password, newPassword }) => {
+    
+    const token = localStorage.getItem("token")
+    const userId = localStorage.getItem("userId")
+    try {
+        const requestUrl = `${baseUrl}/updateUser/${userId}`
+        const requestPayLoad = { name, password, newPassword }
+
+        const response = await axios.patch(requestUrl, requestPayLoad, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        })
+        return response.data
+
+    } catch (error) {
+        console.log("something went wrong", error);
+        if(error.response.data.errorMessage = "old password is incorrect") return toast("old password is incorrect");
+        if(error.response.data.errorMessage="Error in updating user Details") return toast("Error in updating user Details");
+        
+
+    }
+}

@@ -1,0 +1,54 @@
+.main {
+    width: 100%;
+    height: 100%;
+
+    .text {
+        font-family: Open Sans;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-left: 5%;
+        margin-top: 2%;
+    }
+
+    .dataUpdateForm {
+        width: 40%;
+        height: 45%;
+        margin-left: 5%;
+        margin-top: 2%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        
+        .fieldsContainer {
+            width: 100%;
+            height: 15%;
+            display: flex;
+            align-items: center;
+            gap: 2%;
+            border: 1px solid rgba(208, 208, 208, 1);
+            border-radius: 11px;
+
+            .icon {
+                width: 25px;
+                height: 25px;
+
+            }
+            .formField {
+                width: 80%;
+                height: 80%;
+                border: none;
+                outline: none;
+            }
+        }
+
+        .updateBtn{
+            width: 100%;
+            height: 15%;
+            border-radius: 11px;
+            background-color: rgba(23, 162, 184, 1);
+            color: white;
+            margin-top: 4%;
+        }
+    }
+}

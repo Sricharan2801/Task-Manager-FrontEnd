@@ -1,0 +1,50 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.main {
+    width: 100vw;
+    height: 100vh;
+    // background-color: antiquewhite;
+    display: flex;
+
+    .leftSection {
+        width: 20%;
+        height: 100%;
+        position: fixed;
+    }
+
+    .rightSection {
+        width: 80%;
+        height: 100%;
+        // background-color: aquamarine;
+        margin-left: 20%;
+        overflow-x: auto;
+
+        // .header {
+        //     width: 100%;
+        //     height: 25%;
+        //     background-color: azure;
+        // }
+
+        // .taskContainer {
+        //     width: 100%;
+        //     height: calc(100% - 25%);
+        //     display: flex;
+        //     gap: 2%;
+        //     align-items: center;
+        //     background-color: rgb(155, 155, 9);
+        //     overflow-x: auto;
+
+        //     .task {
+        //         width: 30%;
+        //         height: 100%;
+        //         background-color: aqua;
+
+
+        //     }
+        // }
+    }
+}

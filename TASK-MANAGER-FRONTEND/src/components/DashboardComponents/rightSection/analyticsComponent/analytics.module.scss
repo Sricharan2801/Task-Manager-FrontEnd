@@ -1,0 +1,44 @@
+.main{
+    width: 80vw;
+    height: 100vh;
+    
+    .text{
+        font-family: open Sans;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding-left: 5%;
+        padding-top: 2%;
+    }
+
+    .cardContainer{
+        width: 80%;
+        height: 40%;
+        margin-left: 5%;
+        margin-top: 2%;
+        
+        display: flex;
+        gap:2%;
+
+        .analyticsCard{
+            width: 45%;
+            height: 100%;
+            background-color:rgba(249, 252, 255, 1);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+
+            .fieldsContainer{
+                width: 90%;
+                height: 20%;
+               
+                background-color: aquamarine;
+
+                
+                
+            }
+        }
+
+    }
+}

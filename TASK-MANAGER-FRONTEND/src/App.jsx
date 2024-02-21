@@ -1,18 +1,28 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styles from "./App.module.css"
-import { Route, Routes } from 'react-router-dom'
-import RegistrationPage from "./pages/registrationPage/RegistrationPage"
 import { Toaster } from 'react-hot-toast'
-import LoginPage from "./pages/loginPage/LoginPage"
-
+import { Route, Routes } from 'react-router-dom'
+import RegistrationPage from "./pages/registrationPage/RegistrationPage";
+import LoginPage from "./pages/loginPage/LoginPage";
+import DashboardPage from './pages/DashboardPage/DashboardPage';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import Board from './components/DashboardComponents/rightSection/boardComponnet/Board';
+import Settings from './components/DashboardComponents/rightSection/settingsComponnet/Settings';
+import Analytics from './components/DashboardComponents/rightSection/analyticsComponent/Analytics';
 
 const App = () => {
+
   return (
     <main className={styles.main}>
 
       <Routes>
         <Route path='/' element={<RegistrationPage />} />
-        <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/login' element={<LoginPage />} />
+        <Route path='/dashBoard' element={<ProtectedRoute Component={DashboardPage} />} >
+          <Route path="" element={<Board />} />
+          <Route path='settings' element={<Settings />} />
+          <Route path='analytics' element={<Analytics/>}/>
+        </Route>
       </Routes>
       <Toaster />
     </main>

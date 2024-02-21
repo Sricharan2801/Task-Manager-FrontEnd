@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm = () => {
     const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [userDetails, setUserDetails] = useState({
         name: "",
         email: "",
@@ -22,9 +23,8 @@ const RegistrationForm = () => {
     const navigate = useNavigate()
 
     // functionality for toggle the password view.
-    const passwordVisibility = () => {
-        setShowPassword(prevState => !prevState)
-    }
+    const viewPassword = () => setShowPassword(prevState => !prevState)
+    const viewConfirmPassword = () => setShowConfirmPassword(prevState => !prevState)
 
     // function to handle changes in form fields.
     const changeHandler = (e) => {
@@ -56,7 +56,6 @@ const RegistrationForm = () => {
                 <img src={RegistrationPageImage} alt="Image" className={styles.image} />
                 <p className={styles.caption}>Welcome aboard my friend
                     <div className={styles.internalText}> just a couple of clicks and we start</div></p>
-                <p></p>
             </section>
 
             <section className={styles.rightSection}>
@@ -93,7 +92,7 @@ const RegistrationForm = () => {
                         <img src={lockIcon} alt="lockIcon" className={styles.icon} />
 
                         <input
-                            type={showPassword ? "text" : "password"}
+                            type={showConfirmPassword ? "text" : "password"}
                             placeholder='Confirm Password'
                             className={styles.formFields}
                             name='confirmPassword'
@@ -102,7 +101,7 @@ const RegistrationForm = () => {
 
                         <img src={viewIcon} alt="eyeIcon"
                             className={styles.icon}
-                            onClick={() => passwordVisibility()} />
+                            onClick={() => viewConfirmPassword()} />
                     </div>
 
                     <div className={styles.fieldsContainer}>
@@ -118,7 +117,7 @@ const RegistrationForm = () => {
 
                         <img src={viewIcon} alt="eyeIcon"
                             className={styles.icon}
-                            onClick={() => passwordVisibility()} />
+                            onClick={() => viewPassword()} />
                     </div>
                 </form>
 
@@ -130,7 +129,7 @@ const RegistrationForm = () => {
                     >Register</button>
 
                     <p className={styles.text}>Have an account ?</p>
-                    
+
                     <button id={styles.loginBtn}
                         className={styles.btn}
                         onClick={() => navigate("/login")}
