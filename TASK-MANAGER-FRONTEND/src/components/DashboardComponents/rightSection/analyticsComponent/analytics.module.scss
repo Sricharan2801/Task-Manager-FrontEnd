@@ -32,10 +32,31 @@
             .fieldsContainer{
                 width: 90%;
                 height: 20%;
-               
-                background-color: aquamarine;
+                // background-color: aquamarine;
+                display: flex;
+                gap: 2%;
+                align-items: center;
 
-                
+                .icon{
+                    width: 10px;
+                    height: 10px;
+                }
+
+                .fieldName{
+                    font-family: open sans;
+                    font-weight: 500;
+                    font-size: 0.9rem;
+                    width: 40%;
+                    // background-color: aqua;
+                }
+
+                .fieldValue{
+                    font-family: open sans;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    padding-left: 45%;
+                }
+
                 
             }
         }
