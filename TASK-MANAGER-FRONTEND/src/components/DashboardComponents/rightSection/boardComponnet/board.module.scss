@@ -97,8 +97,40 @@
             background-color:rgba(238, 242, 245, 1);
             flex-shrink: 0; 
             border-radius: 10px;
-            font-family: poppins;
             
+            
+            .fieldsContainer{
+                width: 90%;
+                height: 10%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-left: 10%;
+
+                .taskName{
+                    font-family: poppins;
+                    font-size: 1rem;
+                    font-weight: 500;
+                }
+
+                .icon{
+                    width: 25px;
+                    height: 25px;
+                    cursor: pointer;
+                }
+
+                .imageContainer{
+                    .addIcon{
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 10px;
+                        padding-bottom:3px;
+                        cursor: pointer;
+                    }
+                }
+            }
+            
+           
         }
     }
 }

@@ -2,7 +2,6 @@ import axios from "axios";
 const baseUrl = import.meta.env.VITE_BACKEND_URL;
 import toast from "react-hot-toast";
 
-
 export const userRegistration = async ({ name, email, password, confirmPassword }) => {
     try {
         const requestUrl = `${baseUrl}/registration/signUp`
@@ -58,7 +57,5 @@ export const updateUserData = async ({ name, password, newPassword }) => {
         console.log("something went wrong", error);
         if(error.response.data.errorMessage = "old password is incorrect") return toast("old password is incorrect");
         if(error.response.data.errorMessage="Error in updating user Details") return toast("Error in updating user Details");
-        
-
     }
 }

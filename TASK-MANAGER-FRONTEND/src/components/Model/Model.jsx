@@ -7,13 +7,13 @@ const Model = ({ text, proceedBtnText, cancelBtnText }) => {
 
     const navigate = useNavigate()
 
-    const { setIsModelActive,logout } = useAuth()
+    const { setIsModelActive, logout } = useAuth()
 
     const toggleModal = (response) => {
         if (response === "cancel") {
             setIsModelActive(false)
         }
-        if(response === "logout"){
+        if (response === "logout") {
             setIsModelActive(false);
             logout()
             navigate("/login")
@@ -26,8 +26,10 @@ const Model = ({ text, proceedBtnText, cancelBtnText }) => {
                 <div onClick={toggleModal} className={styles.overlay}></div>
                 <div className={styles.modalContent}>
                     <p className={styles.text}>{text ? text : ""}</p>
-                    <button className={styles.proceedBtn} onClick={() => toggleModal("logout")}>{proceedBtnText ? proceedBtnText : ""}</button>
-                    <button className={styles.cancelBtn} onClick={() => toggleModal("cancel")}>{cancelBtnText ? cancelBtnText : ""}</button>
+                    <button className={styles.proceedBtn}
+                        onClick={() => toggleModal("logout")}>{proceedBtnText ? proceedBtnText : ""}</button>
+                    <button className={styles.cancelBtn}
+                        onClick={() => toggleModal("cancel")}>{cancelBtnText ? cancelBtnText : ""}</button>
                 </div>
             </div>
         </>
