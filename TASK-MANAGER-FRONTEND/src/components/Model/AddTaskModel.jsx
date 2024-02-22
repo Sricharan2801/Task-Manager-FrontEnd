@@ -59,7 +59,6 @@ const AddTaskModel = () => {
     }
 
     const handleCheckboxChange = (id, checked) => {
-        console.log(checked);
         if (checked) {
             setSelectedTasks(selectedTasks + 1);
         } else {
@@ -106,7 +105,6 @@ const AddTaskModel = () => {
     const saveTask = async () => {
         try {
             const response = await createTask(title, selectPriority, checkList, taskList, dueDate)
-            console.log(response);
             if (response.data.success = "true") {
                 setIsAddTaskActive(false)
                 toast(response.data.message)
