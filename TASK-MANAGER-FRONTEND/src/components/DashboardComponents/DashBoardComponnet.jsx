@@ -3,6 +3,7 @@ import styles from "./dashBoardComponent.module.scss"
 import LeftSection from './leftSection/LeftSection'
 import RightSection from './rightSection/RightSection'
 
+
 const DashBoardComponnet = () => {
 
     return (

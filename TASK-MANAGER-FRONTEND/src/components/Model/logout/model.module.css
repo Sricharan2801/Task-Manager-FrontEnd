@@ -1,0 +1,78 @@
+body.active-modal {
+    overflow-y: hidden;
+}
+
+.btn-modal {
+    padding: 10px 20px;
+    display: block;
+    margin: 100px auto 0;
+    font-size: 18px;
+}
+
+.modal,
+.overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.overlay {
+    position: fixed;
+    z-index: 1100;
+    background: rgba(49, 49, 49, 0.8);
+}
+
+.modalContent {
+    position: absolute;
+    z-index: 1200; 
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    padding: 14px 28px;
+    border-radius: 3px;
+    max-width: 50%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+}
+
+
+.text {
+    font-size: 0.9rem;
+    font-family: Noto Sans;
+    font-weight: 600;
+    text-align: center;
+}
+
+.proceedBtn {
+    width: 20rem;
+    height: 2rem;
+    background-color: rgba(23, 162, 184, 1);
+    color: white;
+    border-radius: 10px;
+    font-family: Poppins;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.cancelBtn {
+    width: 20rem;
+    height: 2rem;
+    border: 1px solid rgba(207, 54, 54, 1);
+    color: rgba(207, 54, 54, 1);
+    border-radius: 10px;
+    font-family: Poppins;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 10px;
+}

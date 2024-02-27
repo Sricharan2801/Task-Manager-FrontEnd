@@ -7,7 +7,7 @@ import settingsIcon from "../../../assets/icons/settingsIcon.png"
 import logoutIcon from "../../../assets/icons/logoutIcon.png"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useNavigate } from 'react-router-dom'
-import Model from '../../Model/Model'
+import Model from "../../Model/logout/Model"
 
 
 const LeftSection = () => {
@@ -105,13 +105,11 @@ const LeftSection = () => {
                     isModelActive?<Model 
                     text={"Are you sure you want to Logout?"}
                     proceedBtnText = {"Yes,  Logout"}
-                    cancelBtnText = {"Cancel"}/> : <></>
+                    cancelBtnText = {"Cancel"}
+                   /> : <></>
                 }
 
             </section>
-
-
-
         </main>
     )
 }

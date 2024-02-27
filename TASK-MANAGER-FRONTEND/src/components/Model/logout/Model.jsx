@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styles from "./model.module.css"
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 const Model = ({ text, proceedBtnText, cancelBtnText }) => {
@@ -26,8 +26,11 @@ const Model = ({ text, proceedBtnText, cancelBtnText }) => {
                 <div onClick={toggleModal} className={styles.overlay}></div>
                 <div className={styles.modalContent}>
                     <p className={styles.text}>{text ? text : ""}</p>
+
                     <button className={styles.proceedBtn}
-                        onClick={() => toggleModal("logout")}>{proceedBtnText ? proceedBtnText : ""}</button>
+                        onClick={() => toggleModal("logout")}>
+                        {proceedBtnText ? proceedBtnText : ""}</button>
+
                     <button className={styles.cancelBtn}
                         onClick={() => toggleModal("cancel")}>{cancelBtnText ? cancelBtnText : ""}</button>
                 </div>

@@ -63,7 +63,6 @@ const RegistrationForm = () => {
 
                 <form action="" className={styles.form}>
                     <div className={styles.fieldsContainer}>
-
                         <img src={nameIcon} alt="profileIcon" className={styles.icon} />
                         <input
                             type="text"
@@ -87,23 +86,6 @@ const RegistrationForm = () => {
                         />
                     </div>
 
-
-                    <div className={styles.fieldsContainer}>
-                        <img src={lockIcon} alt="lockIcon" className={styles.icon} />
-
-                        <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder='Confirm Password'
-                            className={styles.formFields}
-                            name='confirmPassword'
-                            value={userDetails.confirmPassword}
-                            onChange={changeHandler} />
-
-                        <img src={viewIcon} alt="eyeIcon"
-                            className={styles.icon}
-                            onClick={() => viewConfirmPassword()} />
-                    </div>
-
                     <div className={styles.fieldsContainer}>
                         <img src={lockIcon} alt="lockIcon" className={styles.icon} />
 
@@ -118,6 +100,21 @@ const RegistrationForm = () => {
                         <img src={viewIcon} alt="eyeIcon"
                             className={styles.icon}
                             onClick={() => viewPassword()} />
+                    </div>
+
+                    <div className={styles.fieldsContainer}>
+                        <img src={lockIcon} alt="lockIcon" className={styles.icon} />
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder='Confirm Password'
+                            className={styles.formFields}
+                            name='confirmPassword'
+                            value={userDetails.confirmPassword}
+                            onChange={changeHandler} />
+
+                        <img src={viewIcon} alt="eyeIcon"
+                            className={styles.icon}
+                            onClick={() => viewConfirmPassword()} />
                     </div>
                 </form>
 

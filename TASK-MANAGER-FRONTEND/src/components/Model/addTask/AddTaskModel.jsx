@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import styles from "./addTask.module.css"
-import { createTask } from "../../API/tasks"
-import { useAuth } from '../../contexts/AuthContext'
+import { createTask } from '../../../API/tasks'
+import { useAuth } from '../../../contexts/AuthContext'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
-import highPriorityIcon from "../../assets/icons/highPriorityIcon.png"
-import lowPriorityIcon from "../../assets/icons/lowPriorityIcon.png"
-import moderatePriorityIcon from "../../assets/icons/moderatePriorityIcon.png"
-import deleteIcon from "../../assets/icons/deleteIcon.png"
+import highPriorityIcon from "../../../assets/icons/highPriorityIcon.png"
+import lowPriorityIcon from "../../../assets/icons/lowPriorityIcon.png"
+import moderatePriorityIcon from "../../../assets/icons/moderatePriorityIcon.png"
+import deleteIcon from "../../../assets/icons/deleteIcon.png"
 import toast from 'react-hot-toast'
 
 
-const AddTaskModel = () => {
+const AddTaskModel = ({ reloadBoard }) => {
     // states for number of tasks present & no.of tasks selected
     const [totalTasks, setTotalTasks] = useState(0)
     const [selectedTasks, setSelectedTasks] = useState(0)
@@ -107,6 +107,7 @@ const AddTaskModel = () => {
             const response = await createTask(title, selectPriority, checkList, taskList, dueDate)
             if (response.data.success = "true") {
                 setIsAddTaskActive(false)
+                reloadBoard()
                 toast(response.data.message)
             }
         } catch (error) {
@@ -134,15 +135,31 @@ const AddTaskModel = () => {
 
                     <div className={styles.priorityContainer}>
                         <p className={styles.fieldName}>Select Priority <span className={styles.symbol}>*</span></p>
+
                         <div className={styles.priorites}
-                            onClick={() => setSelectPriority("high priority")}><img src={highPriorityIcon} alt="icon" className={styles.icon} />
-                            HIGH PRIORITY</div>
+                            onClick={() => setSelectPriority("HIGH PRIORITY")}
+                            style={{ backgroundColor: selectPriority === "HIGH PRIORITY" ? 'rgba(238, 236, 236, 1)' : "transparent" }}
+                        >
+                            <img src={highPriorityIcon} alt="icon" className={styles.icon} />
+                            HIGH PRIORITY
+                        </div>
+
                         <div className={styles.priorites}
-                            onClick={() => setSelectPriority("moderate priority")}><img src={moderatePriorityIcon} alt="icon" className={styles.icon} />
-                            MODERATE PRIORITY</div>
+                            onClick={() => setSelectPriority("MODERATE PRIORITY")}
+                            style={{ backgroundColor: selectPriority === "MODERATE PRIORITY" ? 'rgba(238, 236, 236, 1)' : "transparent" }}
+                        >
+                            <img src={moderatePriorityIcon} alt="icon" className={styles.icon} />
+                            MODERATE PRIORITY
+                        </div>
+
+
                         <div className={styles.priorites}
-                            onClick={() => setSelectPriority("low priority")}><img src={lowPriorityIcon} alt="icon" className={styles.icon} />
-                            LOW PRIORITY</div>
+                            onClick={() => setSelectPriority("LOW PRIORITY")}
+                            style={{ backgroundColor: selectPriority === "LOW PRIORITY" ? 'rgba(238, 236, 236, 1)' : "transparent" }}
+                        >
+                            <img src={lowPriorityIcon} alt="icon" className={styles.icon} />
+                            LOW PRIORITY
+                        </div>
                     </div>
 
                     <p className={styles.fieldName}>Checklist ({selectedTasks}/{totalTasks}) <span className={styles.symbol}>*</span></p>

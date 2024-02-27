@@ -39,3 +39,36 @@ export const getTaskDetailsByFilter = async (duration) => {
         console.log("error", error);
     }
 }
+
+export const deleteTask = async(taskId)=>{
+    try {
+        const requestUrl = `${baseUrl}/deleteTask/${taskId}`
+        const response = await axios.delete(requestUrl,{
+            headers:{
+                'Content-Type':"application/json",
+                "Authorization":token
+            }
+        })
+        return response.data
+        
+    } catch (error) {
+        console.log("something went wrong", error);
+    }
+}
+
+export const editTask = async(taskId,title, selectPriority, checkList, taskList, dueDate)=>{
+    try {
+        const requestUrl = `${baseUrl}/updateTask/edit/${taskId}`
+        const requestPayLoad = {title,selectPriority,checkList,taskList,dueDate}
+        const response = await axios.patch(requestUrl,requestPayLoad,{
+            headers:{
+                'Content-Type':"application/json",
+                'Authorization':token
+            }
+        })
+        return response
+        
+    } catch (error) {
+        console.log("Someting went wrong".error);
+    }
+}

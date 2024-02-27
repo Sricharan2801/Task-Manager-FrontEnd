@@ -9,9 +9,9 @@ export const AuthProvider = ({ children }) => {
     });
 
     const [isModelActive, setIsModelActive] = useState(false)
-    const [isAddTaskActive,setIsAddTaskActive] = useState(false)
-
-    
+    const [isAddTaskActive, setIsAddTaskActive] = useState(false)
+    const [isDeleteModel, setIsDeleteModel] = useState(false)
+    const [isUpdateTaskActive, setIsUpdateTaskActive] = useState(false)
 
     const login = () => {
         setIsLoggedIn(true)
@@ -24,8 +24,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("userId")
     }
 
-    return <AuthContext.Provider value={{ 
-        isLoggedIn, login, logout,isModelActive,setIsModelActive,isAddTaskActive,setIsAddTaskActive}}>
+    return <AuthContext.Provider value={{
+        isLoggedIn, login, logout, isModelActive, setIsModelActive,
+        isAddTaskActive, setIsAddTaskActive, isDeleteModel, setIsDeleteModel,
+        isUpdateTaskActive, setIsUpdateTaskActive
+    }}>
         {children}
     </AuthContext.Provider>
 }
