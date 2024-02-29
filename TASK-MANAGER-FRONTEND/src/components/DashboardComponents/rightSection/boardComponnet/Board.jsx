@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './board.module.scss';
-import { getTaskDetailsByFilter } from '../../../../API/tasks';
-import { format, isAfter, parse } from 'date-fns';
+import { getTaskDetailsByFilter, getTaskById, deleteTask, createTask } from '../../../../API/tasks';
+import { createBacklogTask, getBacklogTask, getAllBacklogTasks, removeBacklogTask } from '../../../../API/backlogTasks';
+import { createInProgressTask, getAllInProgressTasks, getInprogressTask, removeInProgressTask } from '../../../../API/inProgressTask';
+import { createDoneTask, getAllDoneTasks, getDoneTask, removeDoneTask } from '../../../../API/doneTasks';
+import { format, parse } from 'date-fns';
 import collapseIcon from '../../../../assets/icons/collapseIcon.png';
 import addIcon from '../../../../assets/icons/addIcon.png';
 import AddTaskModel from '../../../Model/addTask/AddTaskModel';
@@ -16,25 +19,51 @@ import compressingIcon from '../../../../assets/icons/compressingIcon.png';
 import expansionIcon from '../../../../assets/icons/expansionIcon.png';
 import toast from 'react-hot-toast';
 
+
 const Board = () => {
   const [duration, setDuration] = useState('this week')
   const [taskDetails, setTaskDetails] = useState([])
+  const [backlogTasks, setBacklogTasks] = useState([]);
+  const [inProgress, setInProgress] = useState([])
+  const [doneTasks, setDoneTasks] = useState([])
+
   const [priority, setPriority] = useState([])
+  const [backlogPriority, setBackLogPriority] = useState([])
+  const [inProgressPriority, setInProgressPriority] = useState([])
+  const [donePriorities, setDonePriorities] = useState()
+
   const [isChecked, setIsChecked] = useState([])
+  const [selectedCheckLists, setSelectedCheckLists] = useState([])
+  const [totalCheckLists, setTotalCheckLists] = useState([])
+
+  const [backlogIsChecked, setBacklogIsChecked] = useState([]);
+  const [backlogTotalCheckLists, setBacklogTotalCheckLists] = useState(0);
+  const [backLogSelected, setBackLogSelected] = useState(0)
+
+  const [inProgressIsChecked, setInProgressIsChecked] = useState([])
+  const [inProgressTotalLists, setInProgressTotalLists] = useState(0)
+  const [inProgressSelected, setInProgressSelected] = useState(0)
+  
+  const [doneIsChecked, setDoneIsChecked] = useState([])
+  const [doneTotalTasks, setDoneTotalTasks] = useState(0)
+  const [doneSelectedTasks, setDoneSelectedTasks] = useState(0)
 
   const [collapseAll, setCollapseAll] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
-  const [selectedCheckLists, setSelectedCheckLists] = useState([])
-  const [totalCheckLists, setTotalCheckLists] = useState([])
+  const [showBacklogOptions, setShowBacklogOptions] = useState(false)
+  const [showProgressOptions, setShowProgressOptions] = useState(false)
+  const [showDoneOptions, setShowDoneOptions] = useState(false)
+
   const [selectedCardIndex, setSelectedCardIndex] = useState(null)
   const [taskId, setTaskId] = useState("")
-  const [isDeadLineCompleted, setIsDeadLineCompleted] = useState()
 
-  const { isAddTaskActive, setIsAddTaskActive } = useAuth()
-  const { isModelActive, isDeleteModel, setIsDeleteModel } = useAuth()
-  const { isUpdateTaskActive, setIsUpdateTaskActive } = useAuth()
+  const [isDeadLineCompleted, setIsDeadLineCompleted] = useState([])
+  const [backlogTaskDeadLine, setBacklogTaskDeadLine] = useState([])
+  const [progressTaskDeadLine, setProgressTaskDeadLine] = useState([])
 
-
+  const { isAddTaskActive, setIsAddTaskActive,
+    isModelActive, isDeleteModel, setIsDeleteModel, isUpdateTaskActive,
+    setIsUpdateTaskActive, setIsTodo, setIsBacklog, setIsInProgress, setIsDone} = useAuth()
 
   const userName = localStorage.getItem('userName');
   const currentDate = new Date();
@@ -42,11 +71,86 @@ const Board = () => {
   let formattedDueDate;
 
   useEffect(() => {
-    fetchingDetailsByFilter();
+    getBacklogDetails()
+    getInProgressdetails()
+    getDoneTaskDetails()
+  }, [taskDetails])
+
+  // fetching tasks by filter
+  useEffect(() => {
+    fetchingDetailsByFilter()
   }, [duration]);
 
   useEffect(() => {
-    const priorities = taskDetails.map((task) => {
+    const todoPrioritieIcons = setPriorityIcons(taskDetails)
+    setPriority(todoPrioritieIcons)
+
+    const backlogPriorityIcons = setPriorityIcons(backlogTasks)
+    setBackLogPriority(backlogPriorityIcons)
+
+    const progressPriorityIcons = setPriorityIcons(inProgress)
+    setInProgressPriority(progressPriorityIcons)
+
+    const donePriorityIcons = setPriorityIcons(doneTasks)
+    setDonePriorities(donePriorityIcons)
+
+    const check = taskDetails.map((task) => task.checkList);
+    setIsChecked(check);
+
+    const totalChecklists = check.map((totalCheckList) => totalCheckList.length);
+    setTotalCheckLists(totalChecklists);
+
+    const checkBackLog = backlogTasks.map((task) => task.checkList)
+    setBacklogIsChecked(checkBackLog)
+
+    const totalBacklogCheckList = checkBackLog.map(totalCheckList => totalCheckList.length)
+    setBacklogTotalCheckLists(totalBacklogCheckList)
+
+    const checkInProgress = inProgress.map(task => task.checkList)
+    setInProgressIsChecked(checkInProgress)
+
+    const totalBackLogCheckList = checkInProgress.map(totalCheckList => totalCheckList.length)
+    setInProgressTotalLists(totalBackLogCheckList)
+
+    const checkDoneTasks = doneTasks.map(task => task.checkList)
+    setDoneIsChecked(checkDoneTasks)
+
+    const totalDoneCheckList = checkDoneTasks.map(totalCheckList => totalCheckList.length)
+    setDoneTotalTasks(totalDoneCheckList)
+
+  }, [taskDetails, backlogTasks, inProgress, doneTasks]);
+
+  // useEffect to handle the selected checkBoxes
+  useEffect(() => {
+    const selectedChecklists = isChecked.map((checkedList) => checkedList.filter((item) => item === true).length)
+    setSelectedCheckLists(selectedChecklists);
+
+    const selectedBacklogTasks = backlogIsChecked.map(checkedList => checkedList.filter((item) => item === true).length)
+    setBackLogSelected(selectedBacklogTasks)
+
+    const selectedProgressTasks = inProgressIsChecked.map(checkedList => checkedList.filter((item) => item === true).length)
+    setInProgressSelected(selectedProgressTasks)
+
+    const selectedDoneTasks = doneIsChecked.map(checkedList => checkedList.filter((item) => item === true).length)
+    setDoneSelectedTasks(selectedDoneTasks)
+  }, [isChecked, backlogIsChecked, inProgressIsChecked, doneIsChecked])
+
+  // useEffect to check dueDate
+  useEffect(() => {
+    const todoDeadline = updateDeadLine(taskDetails)
+    setIsDeadLineCompleted(todoDeadline);
+
+    const progressDeadLine = updateDeadLine(inProgress)
+    setProgressTaskDeadLine(progressDeadLine)
+  }, [taskDetails])
+
+  useEffect(() => {
+    const backlogDeadLine = updateDeadLine(backlogTasks)
+    setBacklogTaskDeadLine(backlogDeadLine)
+  }, [backlogTasks])
+
+  const setPriorityIcons = (tasks) => {
+    return tasks.map(task => {
       if (task.selectPriority === 'HIGH PRIORITY') {
         return highPriorityIcon;
       } else if (task.selectPriority === 'MODERATE PRIORITY') {
@@ -54,37 +158,18 @@ const Board = () => {
       } else if (task.selectPriority === 'LOW PRIORITY') {
         return lowPriorityIcon;
       }
-    });
-    setPriority(priorities);
-
-    const check = taskDetails.map((task) => task.checkList);
-    setIsChecked(check);
-
-    const totalChecklists = check.map((totalCheckList) => totalCheckList.length);
-    setTotalCheckLists(totalChecklists);
-  }, [taskDetails]);
-
-  // useEffect to handle the selected checkBoxes
-  useEffect(() => {
-    const selectedChecklists = isChecked.map((checkedList) => checkedList.filter((item) => item === true).length)
-    setSelectedCheckLists(selectedChecklists);
-  }, [isChecked])
-
-  // useEffect to check dueDate
-  useEffect(() => {
-    updateDeadLine()
-  }, [taskDetails])
+    })
+  }
 
   // function to check dueDate
-  const updateDeadLine = () => {
+  const updateDeadLine = (tasks) => {
     const currentDate = new Date()
-    const formattedCurrentDate = format(currentDate, "dd/MM/yyyy")
-    const dueDates = taskDetails.map(item => item.dueDate)
-    const checkDueDates = dueDates.map(date => {
-      if (date >= formattedCurrentDate) return false
-      if (date < formattedCurrentDate) return true
+    const dueDatesArray = tasks.map(item => parse(item.dueDate, "dd/MM/yyyy", new Date()))
+    const checkDueDates = dueDatesArray.map(dueDate => {
+      if (dueDate >= currentDate) return false
+      if (dueDate < currentDate) return true
     })
-    setIsDeadLineCompleted(checkDueDates);
+    return checkDueDates
   };
 
   // function to add new task
@@ -102,6 +187,9 @@ const Board = () => {
   const reloadBoard = async () => {
     try {
       await fetchingDetailsByFilter()
+      await getBacklogDetails()
+      await getInProgressdetails()
+      await getDoneTaskDetails()
     } catch (error) {
     }
   }
@@ -110,16 +198,18 @@ const Board = () => {
   const fetchingDetailsByFilter = async () => {
     try {
       const response = await getTaskDetailsByFilter(duration);
-
       const updatedTaskDetails = response.taskDetails.map((task) => ({
         ...task,
         collapsed: false,
       }));
-      setTaskDetails(updatedTaskDetails);
+
+      const filteredTaskDetails = updatedTaskDetails.filter(task => !backlogTasks.some(backlogTask => backlogTask._id === task._id));
+      setTaskDetails(filteredTaskDetails);
+
     } catch (error) {
       console.log('something went wrong', error);
     }
-  };
+  }
 
   // function to collapse individual task
   const toggleTask = (index) => {
@@ -127,9 +217,37 @@ const Board = () => {
     updatedTaskDetails[index] = {
       ...updatedTaskDetails[index],
       collapsed: !updatedTaskDetails[index].collapsed,
-    };
+    }
     setTaskDetails(updatedTaskDetails);
   };
+
+  const toggleBacklogTask = (index) => {
+    const updatedTaskDetails = [...backlogTasks];
+    updatedTaskDetails[index] = {
+      ...updatedTaskDetails[index],
+      collapsed: !updatedTaskDetails[index].collapsed,
+    };
+    setBacklogTasks(updatedTaskDetails);
+  };
+
+  const toggleProgressTask = (index) => {
+    const updatedTaskDetails = [...inProgress];
+    updatedTaskDetails[index] = {
+      ...updatedTaskDetails[index],
+      collapsed: !updatedTaskDetails[index].collapsed,
+    };
+    setInProgress(updatedTaskDetails);
+  };
+
+  const toggleDoneTask = (index) => {
+    const updatedTaskDetails = [...doneTasks];
+    updatedTaskDetails[index] = {
+      ...updatedTaskDetails[index],
+      collapsed: !updatedTaskDetails[index].collapsed,
+    };
+    setDoneTasks(updatedTaskDetails);
+  };
+
 
   // function to collapse all tasks
   const toggleAllTasks = () => {
@@ -141,6 +259,33 @@ const Board = () => {
     setCollapseAll(!collapseAll);
   };
 
+  const toggleAllBacklogTasks = () => {
+    const updatedBacklogTasks = backlogTasks.map((task) => ({
+      ...task,
+      collapsed: !collapseAll,
+    }))
+    setBacklogTasks(updatedBacklogTasks)
+    setCollapseAll(!collapseAll)
+  };
+
+  const toggleAllProgressTask = () => {
+    const updatedProgressTasks = inProgress.map(task => ({
+      ...task,
+      collapsed: !collapseAll
+    }))
+    setInProgress(updatedProgressTasks)
+    setCollapseAll(!collapseAll)
+  }
+
+  const toggleAllDoneTask = () => {
+    const updatedDoneTasks = doneTasks.map(task => ({
+      ...task,
+      collapsed: !collapseAll
+    }))
+    setDoneTasks(updatedDoneTasks)
+    setCollapseAll(!collapseAll)
+  }
+
   // function to handle the check box 
   const handleCheckboxChange = (taskIndex, checkboxIndex) => {
     const updatedIsChecked = [...isChecked];
@@ -148,30 +293,445 @@ const Board = () => {
     setIsChecked(updatedIsChecked);
   };
 
-  // function to toggle the options button
-  const toggleOptions = (index) => {
-    setSelectedCardIndex(index === selectedCardIndex ? null : index);
-    setShowOptions(selectedCardIndex !== index); // Show options only if the selected card index is not the same as the clicked index
+  const handleBacklogCheckboxChange = (taskIndex, checkboxIndex) => {
+    if (!backlogIsChecked[taskIndex]) {
+      const newBacklogIsChecked = backlogTasks.map(() => Array(backlogTasks[taskIndex].checkList.length).fill(false))
+      newBacklogIsChecked[taskIndex][checkboxIndex] = !newBacklogIsChecked[taskIndex][checkboxIndex];
+      setBacklogIsChecked(newBacklogIsChecked);
+    } else {
+      const updatedBacklogIsChecked = [...backlogIsChecked];
+      updatedBacklogIsChecked[taskIndex][checkboxIndex] = !updatedBacklogIsChecked[taskIndex][checkboxIndex];
+      setBacklogIsChecked(updatedBacklogIsChecked);
+    }
+    const selectedChecklists = backlogIsChecked[taskIndex].filter(item => item).length;
+    const updatedBackLogSelected = [...backLogSelected];
+    updatedBackLogSelected[taskIndex] = selectedChecklists;
+    setBackLogSelected(updatedBackLogSelected);
   };
 
 
-  // function handles update,delete and sharing of a task
-  const handleOptions = async (taskId, input) => {
+  const handleInProgressCheckboxChange = (taskIndex, checkboxIndex) => {
+    const updatedInProgressIsChecked = [...inProgressIsChecked];
+    updatedInProgressIsChecked[taskIndex][checkboxIndex] = !updatedInProgressIsChecked[taskIndex][checkboxIndex];
+    setInProgressIsChecked(updatedInProgressIsChecked);
 
+    const selectedChecklists = updatedInProgressIsChecked[taskIndex].filter(item => item === true).length;
+    const updatedInProgressSelected = [...inProgressSelected];
+    updatedInProgressSelected[taskIndex] = selectedChecklists;
+    setInProgressSelected(updatedInProgressSelected);
+  };
+
+  const handleDoneCheckboxChange = (taskIndex, checkboxIndex) => {
+    const updatedDoneIsChecked = [...doneIsChecked];
+    updatedDoneIsChecked[taskIndex][checkboxIndex] = !updatedDoneIsChecked[taskIndex][checkboxIndex];
+    setDoneIsChecked(updatedDoneIsChecked);
+
+    const selectedChecklists = updatedDoneIsChecked[taskIndex].filter(item => item === true).length;
+    const updatedDoneSelected = [...doneSelected];
+    updatedDoneSelected[taskIndex] = selectedChecklists;
+    setDoneSelectedTasks(updatedDoneSelected);
+  };
+
+  // function to toggle the options button
+  const toggleOptions = (index, input) => {
+    switch (input) {
+      case "todo":
+        setSelectedCardIndex(index === selectedCardIndex ? null : index);
+        setShowOptions(selectedCardIndex !== index);
+        break;
+      case "backlog":
+        setSelectedCardIndex(index === selectedCardIndex ? null : index);
+        setShowBacklogOptions(selectedCardIndex !== index);
+        break;
+      case "inprogress":
+        setSelectedCardIndex(index === selectedCardIndex ? null : index);
+        setShowProgressOptions(selectedCardIndex !== index);
+        break;
+      case "done":
+        setSelectedCardIndex(index === selectedCardIndex ? null : index);
+        setShowDoneOptions(selectedCardIndex !== index);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const shareFunctionality = (id) => {
+    const readOnlyLink = `${window.location.origin}/share/${id}`
+    navigator.clipboard.writeText(readOnlyLink)
+    toast.success("Link Copied", {
+      position: "top-right", style: {
+        border: "1px solid rgba(72, 193, 181, 1)",
+        borderRadius: "12px",
+        backgroundColor: "rgba(246, 255, 249, 1)",
+        marginTop: "2rem",
+        width: "10rem"
+      }
+    })
+  }
+  // function handles update,delete and sharing of a task
+  const handleOptions = async (id, input) => {
+    setIsTodo(true)
+    setIsInProgress(false)
+    setIsBacklog(false)
+    setIsDone(false)
+
+    // for share function 
+    localStorage.setItem("isTodo", "true")
+    localStorage.setItem("isInProgress", "false")
+    localStorage.setItem("isBacklog", "false")
+    localStorage.setItem("isDone", "false")
     if (input === "deleteTask") {
-      setTaskId(taskId)
+      setTaskId(id)
       setIsDeleteModel(true)
       setShowOptions(!showOptions)
     }
-
     if (input === "editTask") {
-      setTaskId(taskId)
+      setTaskId(id)
       setIsUpdateTaskActive(true)
       setShowOptions(!showOptions)
     }
+    if (input === "shareTask") {
+      setShowOptions(!showOptions)
+      setTaskId(id)
+      shareFunctionality(id)
+    }
   }
 
+  const handleBacklogOptions = (id, input) => {
+    setIsTodo(false)
+    setIsInProgress(false)
+    setIsBacklog(true)
+    setIsDone(false)
+    localStorage.setItem("isTodo", "false")
+    localStorage.setItem("isInProgress", "false")
+    localStorage.setItem("isBacklog", "true")
+    localStorage.setItem("isDone", "false")
+    if (input === "deleteTask") {
+      setTaskId(id)
+      setIsDeleteModel(true)
+      setShowBacklogOptions(!showBacklogOptions)
+    }
+    if (input === "editTask") {
+      setTaskId(id)
+      setIsUpdateTaskActive(true)
+      setShowBacklogOptions(!showBacklogOptions)
+    }
+    if (input === "shareTask") {
+      setShowBacklogOptions(!showBacklogOptions)
+      setTaskId(id)
+      shareFunctionality(id)
+    }
+  }
 
+  const handlerProgressOptions = (id, input) => {
+    setIsTodo(false)
+    setIsInProgress(true)
+    setIsBacklog(false)
+    setIsDone(false)
+    localStorage.setItem("isTodo", "false")
+    localStorage.setItem("isInProgress", "true")
+    localStorage.setItem("isBacklog", "false")
+    localStorage.setItem("isDone", "false")
+    if (input === "deleteTask") {
+      setTaskId(id)
+      setIsDeleteModel(true)
+      setShowProgressOptions(!setShowProgressOptions)
+    }
+    if (input === "editTask") {
+      setTaskId(id)
+      setIsUpdateTaskActive(true)
+      setShowProgressOptions(!setShowProgressOptions)
+    }
+    if (input === "shareTask") {
+      setShowProgressOptions(!setShowProgressOptions)
+      setTaskId(id)
+      shareFunctionality(id)
+    }
+  }
+
+  const handleDoneOptions = (id, input) => {
+    setIsTodo(false)
+    setIsInProgress(false)
+    setIsBacklog(false)
+    setIsDone(true)
+    localStorage.setItem("isTodo", "false")
+    localStorage.setItem("isInProgress", "false")
+    localStorage.setItem("isBacklog", "false")
+    localStorage.setItem("isDone", "true")
+    if (input === "deleteTask") {
+      setTaskId(id)
+      setIsDeleteModel(true)
+      setShowDoneOptions(!setShowDoneOptions)
+    }
+    if (input === "editTask") {
+      setTaskId(id)
+      setIsUpdateTaskActive(true)
+      setShowDoneOptions(!setShowDoneOptions)
+    }
+    if (input === "shareTask") {
+      setShowDoneOptions(!setShowDoneOptions)
+      setTaskId(id)
+      shareFunctionality(id)
+    }
+  }
+
+  const getBacklogDetails = async () => {
+    const backlogTasks = await getAllBacklogTasks()
+    if (Array.isArray(backlogTasks.tasks)) {
+      setBacklogTasks(backlogTasks.tasks);
+    } else {
+      console.log("No tasks found in the backlog or invalid response format");
+      setBacklogTasks([]);
+    }
+  }
+
+  const getInProgressdetails = async () => {
+    const inProgressTasks = await getAllInProgressTasks()
+    if (Array.isArray(inProgressTasks.tasks)) {
+      setInProgress(inProgressTasks.tasks)
+    } else {
+      console.log("No tasks found in the Inprogress or invalid response format");
+      setInProgress([]);
+    }
+  }
+
+  const getDoneTaskDetails = async () => {
+    const doneTasks = await getAllDoneTasks()
+    if (Array.isArray(doneTasks.tasks)) {
+      setDoneTasks(doneTasks.tasks)
+    } else {
+      console.log("No tasks found in the donetasks or invalid response format");
+      setInProgress([]);
+    }
+  }
+
+  // Function to move task to backlog
+  const moveToBacklog = async (id, input) => {
+    if (input === "todo") {
+      const selectedTask = await getTaskById(id)
+      console.log(selectedTask);
+      const removeTask = await deleteTask(id)
+      console.log(removeTask);
+      const payLoad = {
+        title: selectedTask.taskDetails.title,
+        selectPriority: selectedTask.taskDetails.selectPriority,
+        checkList: selectedTask.taskDetails.checkList,
+        taskList: selectedTask.taskDetails.taskList,
+        dueDate: selectedTask.taskDetails.dueDate
+      }
+      const postTask = await createBacklogTask(payLoad)
+      console.log(postTask);
+      if (postTask.data.success === true) {
+        getBacklogDetails()
+        setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id))
+      }
+    }
+
+    if (input === "progress") {
+      const selectedTask = await getInprogressTask(id)
+      const removeTask = await removeInProgressTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createBacklogTask(payLoad)
+      if (postTask.data.success === true) {
+        getBacklogDetails()
+        getInProgressdetails()
+      }
+    }
+
+    if (input === "done") {
+      const selectedTask = await getDoneTask(id)
+      await removeDoneTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createBacklogTask(payLoad)
+      if (postTask.data.success === true) {
+        getBacklogDetails()
+        getDoneTaskDetails()
+      }
+    }
+  };
+
+  // move to todo 
+  const moveToToDo = async (id, input) => {
+    if (input === "backLog") {
+      const selectedTask = await getBacklogTask(id)
+      const removeTask = await removeBacklogTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createTask(payLoad)
+      if (postTask.data.success === true) {
+        fetchingDetailsByFilter()
+      }
+    }
+
+    if (input === "progress") {
+      const selectedTask = await getInprogressTask(id)
+      const removeTask = await removeInProgressTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createTask(payLoad)
+      if (postTask.data.success === true) {
+        fetchingDetailsByFilter()
+        getInProgressdetails()
+      }
+    }
+
+    if (input === "done") {
+      const selectedTask = await getDoneTask(id)
+      await removeDoneTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createTask(payLoad)
+      if (postTask.data.success === true) {
+        fetchingDetailsByFilter()
+        getDoneTaskDetails()
+      }
+    }
+  }
+
+  // move to progress
+  const moveToProgress = async (id, input) => {
+    if (input === "todo") {
+      const selectedTask = await getTaskById(id)
+      const removeTask = await deleteTask(id)
+      const payLoad = {
+        title: selectedTask.taskDetails.title,
+        selectPriority: selectedTask.taskDetails.selectPriority,
+        checkList: selectedTask.taskDetails.checkList,
+        taskList: selectedTask.taskDetails.taskList,
+        dueDate: selectedTask.taskDetails.dueDate
+      }
+      const postTask = await createInProgressTask(payLoad)
+      if (postTask.data.success === true) {
+        getInProgressdetails()
+        setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id));
+      }
+
+    }
+
+    if (input === "backLog") {
+      const selectedTask = await getBacklogTask(id)
+      const removeTask = await removeBacklogTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createInProgressTask(payLoad)
+      if (postTask.data.success === true) {
+        getInProgressdetails()
+        getBacklogDetails()
+      }
+    }
+
+    if (input === "done") {
+      const selectedTask = await getDoneTask(id)
+      await removeDoneTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createInProgressTask(payLoad)
+      if (postTask.data.success === true) {
+        getInProgressdetails()
+        getDoneTaskDetails()
+      }
+    }
+  }
+
+  // move to done
+  const moveToDone = async (id, input) => {
+    if (input === "todo") {
+      const selectedTask = await getTaskById(id)
+      const removeTask = await deleteTask(id)
+      const payLoad = {
+        title: selectedTask.taskDetails.title,
+        selectPriority: selectedTask.taskDetails.selectPriority,
+        checkList: selectedTask.taskDetails.checkList,
+        taskList: selectedTask.taskDetails.taskList,
+        dueDate: selectedTask.taskDetails.dueDate
+      }
+      const postTask = await createDoneTask(payLoad)
+      if (postTask.data.success === true) {
+        getDoneTaskDetails()
+        setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id));
+      }
+    }
+
+    if (input === "backLog") {
+      const selectedTask = await getBacklogTask(id)
+      const removeTask = await removeBacklogTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createDoneTask(payLoad)
+      if (postTask.data.success === true) {
+        getDoneTaskDetails()
+        getBacklogDetails()
+      }
+    }
+
+    if (input === "progress") {
+      const selectedTask = await getInprogressTask(id)
+      const removeTask = await removeInProgressTask(id)
+      const payLoad = {
+        title: selectedTask.tasks.title,
+        selectPriority: selectedTask.tasks.selectPriority,
+        checkList: selectedTask.tasks.checkList,
+        taskList: selectedTask.tasks.taskList,
+        dueDate: selectedTask.tasks.dueDate
+      }
+      const postTask = await createDoneTask(payLoad)
+      if (postTask.data.success === true) {
+        getDoneTaskDetails()
+        getInProgressdetails()
+      }
+    }
+  }
+
+  const truncateTitle = (title) => {
+    const maxCharacters = 15
+    if (title.length > maxCharacters) {
+      return title.substring(0, maxCharacters) + '...'
+    }
+    return title
+  }
 
   return (
     <main className={styles.main}>
@@ -197,12 +757,79 @@ const Board = () => {
       </header>
 
       <section className={styles.bottomSection}>
+
         {/* backlog tasks */}
         <div className={styles.taskContainer}>
           <div className={styles.fieldsContainer}>
             <p className={styles.taskName}>Backlog</p>
-            <img src={collapseIcon} alt="icon" className={styles.icon} />
+            <img src={collapseIcon} alt="icon" className={styles.icon} onClick={toggleAllBacklogTasks} />
           </div>
+
+          {backlogTasks.map((item, index) => (
+            <div className={`${styles.taskCard} ${collapseAll || item.collapsed ? styles.collapsed : ''}`} key={index} style={{ position: isModelActive ? " " : "relative" }}>
+              {/* Priority Container */}
+              <div className={styles.priorityContainer}>
+                <span className={styles.priority}>
+                  {backlogPriority[index] && <img src={backlogPriority[index]} alt="" />}
+                  <p className={styles.priorityName}>{item.selectPriority}</p>
+                </span>
+                <img src={optionsIcon} alt="optionsIcon" className={styles.optionsIcon} onClick={() => toggleOptions(index, "backlog")} />
+              </div>
+
+              {/* Title */}
+              <h1 className={styles.title} title={item.title}>{truncateTitle(item.title)}</h1>
+
+              {/* Checklists */}
+              <div className={styles.checkListContainer}>
+                {/* Heading */}
+                <div className={styles.headingAndExpansionBtn}>
+                  <p className={styles.heading}>Checklist ({backLogSelected[index]}/{backlogTotalCheckLists[index]})</p>
+                  <img src={item.collapsed ? compressingIcon : expansionIcon} alt="icon" className={styles.arrowIcon} onClick={() => toggleBacklogTask(index)} />
+                </div>
+
+                {/* Checkbox and Task Name */}
+                {!item.collapsed && (
+                  <>
+                    {backlogIsChecked[index] && backlogIsChecked[index].map((isCheckedItem, idx) => (
+
+                      <div key={idx} className={styles.tasksConatiner}>
+                        <div className={styles.checkboxContainer}>
+                          <input type="checkbox" className={styles.checkBox} checked={isCheckedItem} onChange={() => handleBacklogCheckboxChange(index, idx)} />
+                        </div>
+                        <p className={styles.task}>{item.taskList[idx]}</p>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {/* Controls */}
+                <div className={styles.dueDateAndControlsSection}>
+                  {item.dueDate ? (
+                    <span className={styles.dueDate} style={{
+                      backgroundColor: backlogTaskDeadLine[index] ? "rgba(207, 54, 54, 1)" : "rgba(219, 219, 219, 1)",
+                      color: backlogTaskDeadLine[index] ? "rgba(255, 255, 255, 1)" : "rgba(90, 90, 90, 1)"
+                    }}>
+                      {formattedDueDate = format(parse(item.dueDate, 'dd/MM/yyyy', new Date()), 'MMM do')}
+                    </span>
+                  ) : (
+                    <div className={styles.empty}></div>
+                  )}
+                  <div className={styles.buttonsContainer}>
+                    <button className={styles.contolBtns} onClick={() => moveToToDo(item._id, "backLog")}>TO-DO</button>
+                    <button className={styles.contolBtns} onClick={() => moveToProgress(item._id, "backLog")}>PROGRESS</button>
+                    <button className={styles.contolBtns} onClick={() => moveToDone(item._id, "backLog")}>DONE</button>
+                  </div>
+                </div>
+              </div>
+              {selectedCardIndex === index && showBacklogOptions && (
+                <div className={styles.optionsContainer}>
+                  <p className={styles.options} onClick={() => handleBacklogOptions(item._id, "editTask")}>Edit</p>
+                  <p className={styles.options} onClick={() => handleBacklogOptions(item._id, "shareTask")}>Share</p>
+                  <p className={styles.options} id={styles.deleteOption} onClick={() => handleBacklogOptions(item._id, "deleteTask")}>Delete</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* ...................................................................... */}
@@ -225,18 +852,16 @@ const Board = () => {
                 key={index} style={{ position: isModelActive ? " " : "relative" }}>
                 {/* priority Container */}
                 <div className={styles.priorityContainer}>
-
                   <span className={styles.priority}>
                     {priority[index] && <img src={priority[index]} alt="" />}
                     <p className={styles.priorityName}>{item.selectPriority}</p>
                   </span>
                   <img src={optionsIcon} alt="optionsIcon"
-                    className={styles.optionsIcon} onClick={() => toggleOptions(index)} />
-
+                    className={styles.optionsIcon} onClick={() => toggleOptions(index, "todo")} />
                 </div>
 
                 {/* title */}
-                <h1 className={styles.title}>{item.title}</h1>
+                <h1 className={styles.title} title={item.title}>{truncateTitle(item.title)}</h1>
 
                 {/* checkLists */}
                 <div className={styles.checkListContainer}>
@@ -284,9 +909,9 @@ const Board = () => {
                       <div className={styles.empty}></div>
                     )}
                     <div className={styles.buttonsContainer}>
-                      <button className={styles.contolBtns}>BACKLOG</button>
-                      <button className={styles.contolBtns}>PROGRESS</button>
-                      <button className={styles.contolBtns}>DONE</button>
+                      <button className={styles.contolBtns} onClick={() => moveToBacklog(item._id, "todo")}>BACKLOG</button>
+                      <button className={styles.contolBtns} onClick={() => moveToProgress(item._id, "todo")}>PROGRESS</button>
+                      <button className={styles.contolBtns} onClick={() => moveToDone(item._id, "todo")}>DONE</button>
                     </div>
                   </div>
 
@@ -295,7 +920,7 @@ const Board = () => {
                 {selectedCardIndex === index && showOptions && (
                   <div className={styles.optionsContainer}>
                     <p className={styles.options} onClick={() => handleOptions(item._id, "editTask")}>Edit</p>
-                    <p className={styles.options}
+                    <p className={styles.options} onClick={() => handleOptions(item._id, "shareTask")}
                     >Share</p>
                     <p className={styles.options} id={styles.deleteOption}
                       onClick={() => handleOptions(item._id, "deleteTask")}>
@@ -315,16 +940,143 @@ const Board = () => {
         <div className={styles.taskContainer}>
           <div className={styles.fieldsContainer}>
             <p className={styles.taskName}>In progress</p>
-            <img src={collapseIcon} alt="icon" className={styles.icon} />
+            <img src={collapseIcon} alt="icon" className={styles.icon} onClick={() => toggleAllProgressTask()} />
           </div>
+
+          {inProgress.map((item, index) => (
+            <div className={styles.taskCard} key={index}
+              style={{ position: isModelActive ? " " : "relative" }}>
+              {/* Priority Container */}
+              <div className={styles.priorityContainer}>
+                <span className={styles.priority}>
+                  {inProgressPriority[index] && <img src={inProgressPriority[index]} alt="" />}
+                  <p className={styles.priorityName}>{item.selectPriority}</p>
+                </span>
+                <img src={optionsIcon} alt="optionsIcon" className={styles.optionsIcon} onClick={() => toggleOptions(index, "inprogress")} />
+              </div>
+
+              {/* Title */}
+              <h1 className={styles.title} title={item.title}>{truncateTitle(item.title)}</h1>
+
+              {/* Checklists */}
+              <div className={styles.checkListContainer}>
+                {/* Heading */}
+                <div className={styles.headingAndExpansionBtn}>
+                  <p className={styles.heading}>Checklist ({inProgressSelected[index]}/{inProgressTotalLists[index]})</p>
+                  <img src={item.collapsed ? compressingIcon : expansionIcon} alt="icon" className={styles.arrowIcon} onClick={() => toggleProgressTask(index)} />
+                </div>
+
+                {/* Checkbox and Task Name */}
+                {!item.collapsed && (
+                  <>
+                    {inProgressIsChecked[index] && inProgressIsChecked[index].map((isCheckedItem, idx) => (
+                      <div key={idx} className={styles.tasksConatiner}>
+                        <div className={styles.checkboxContainer}>
+                          <input type="checkbox" className={styles.checkBox} checked={isCheckedItem} onChange={() => handleInProgressCheckboxChange(index, idx)} />
+                        </div>
+                        <p className={styles.task}>{item.taskList[idx]}</p>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {/* Controls */}
+                <div className={styles.dueDateAndControlsSection}>
+                  {item.dueDate ? (
+                    <span className={styles.dueDate} style={{ backgroundColor: progressTaskDeadLine[index] ? "rgba(207, 54, 54, 1)" : "rgba(219, 219, 219, 1)", color: progressTaskDeadLine[index] ? "rgba(255, 255, 255, 1)" : "rgba(90, 90, 90, 1)" }}>
+                      {formattedDueDate = format(parse(item.dueDate, 'dd/MM/yyyy', new Date()), 'MMM do')}
+                    </span>
+                  ) : (
+                    <div className={styles.empty}></div>
+                  )}
+                  <div className={styles.buttonsContainer}>
+                    <button className={styles.contolBtns} onClick={() => moveToBacklog(item._id, "progress")}>BACKLOG</button>
+                    <button className={styles.contolBtns} onClick={() => moveToToDo(item._id, "progress")}>TO-DO</button>
+                    <button className={styles.contolBtns} onClick={() => moveToDone(item._id, "progress")}>DONE</button>
+                  </div>
+                </div>
+              </div>
+              {selectedCardIndex === index && showProgressOptions && (
+                <div className={styles.optionsContainer}>
+                  <p className={styles.options} onClick={() => handlerProgressOptions(item._id, "editTask")}>Edit</p>
+                  <p className={styles.options} onClick={() => handlerProgressOptions(item._id, "shareTask")}>Share</p>
+                  <p className={styles.options} id={styles.deleteOption} onClick={() => handlerProgressOptions(item._id, "deleteTask")}>Delete</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
+        {/* ............................. */}
         {/* done tasks */}
         <div className={styles.taskContainer}>
           <div className={styles.fieldsContainer}>
             <p className={styles.taskName}>Done</p>
-            <img src={collapseIcon} alt="icon" className={styles.icon} />
+            <img src={collapseIcon} alt="icon" className={styles.icon} onClick={() => toggleAllDoneTask()} />
           </div>
+
+          {doneTasks.map((item, index) => (
+            <div className={styles.taskCard} key={index}
+              style={{ position: isModelActive ? " " : "relative" }}>
+              {/* Priority Container */}
+              <div className={styles.priorityContainer}>
+                <span className={styles.priority}>
+                  {donePriorities[index] && <img src={donePriorities[index]} alt="" />}
+                  <p className={styles.priorityName}>{item.selectPriority}</p>
+                </span>
+                <img src={optionsIcon} alt="optionsIcon" className={styles.optionsIcon} onClick={() => toggleOptions(index, "done")} />
+              </div>
+
+              {/* Title */}
+              <h1 className={styles.title} title={item.title}>{truncateTitle(item.title)}</h1>
+
+              {/* Checklists */}
+              <div className={styles.checkListContainer}>
+                {/* Heading */}
+                <div className={styles.headingAndExpansionBtn}>
+                  <p className={styles.heading}>Checklist ({doneSelectedTasks[index]}/{doneTotalTasks[index]})</p>
+                  <img src={item.collapsed ? compressingIcon : expansionIcon} alt="icon" className={styles.arrowIcon} onClick={() => toggleDoneTask(index, item._id)} />
+                </div>
+
+                {/* Checkbox and Task Name */}
+                {!item.collapsed && (
+                  <>
+                    {doneIsChecked[index] && doneIsChecked[index].map((isCheckedItem, idx) => (
+                      <div key={idx} className={styles.tasksConatiner}>
+                        <div className={styles.checkboxContainer}>
+                          <input type="checkbox" className={styles.checkBox} checked={isCheckedItem} onChange={() => handleDoneCheckboxChange(index, idx)} />
+                        </div>
+                        <p className={styles.task}>{item.taskList[idx]}</p>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {/* Controls */}
+                <div className={styles.dueDateAndControlsSection}>
+                  {item.dueDate ? (
+                    <span className={styles.dueDate} style={{ backgroundColor: "rgba(99, 192, 91, 1)", color: "rgba(255, 255, 255, 1)" }}>
+                      {formattedDueDate = format(parse(item.dueDate, 'dd/MM/yyyy', new Date()), 'MMM do')}
+                    </span>
+                  ) : (
+                    <div className={styles.empty}></div>
+                  )}
+                  <div className={styles.buttonsContainer}>
+                    <button className={styles.contolBtns} onClick={() => moveToBacklog(item._id, "done")}>BACKLOG</button>
+                    <button className={styles.contolBtns} onClick={() => moveToToDo(item._id, "done")}>TO-DO</button>
+                    <button className={styles.contolBtns} onClick={() => moveToProgress(item._id, "done")}>PROGRESS</button>
+                  </div>
+                </div>
+              </div>
+              {selectedCardIndex === index && showDoneOptions && (
+                <div className={styles.optionsContainer}>
+                  <p className={styles.options} onClick={() => handleDoneOptions(item._id, "editTask")}>Edit</p>
+                  <p className={styles.options} onClick={() => handleDoneOptions(item._id, "shareTask")}>Share</p>
+                  <p className={styles.options} id={styles.deleteOption} onClick={() => handleDoneOptions(item._id, "deleteTask")}>Delete</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -343,6 +1095,7 @@ const Board = () => {
       {
         isUpdateTaskActive ?
           <UpdateTaskModel taskDetails={taskDetails}
+            backlogTasks={backlogTasks} inProgress={inProgress} doneTasks={doneTasks}
             taskId={taskId}
             reloadBoard={reloadBoard} />
           :

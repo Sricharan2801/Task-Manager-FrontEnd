@@ -34,23 +34,17 @@ const LoginForm = () => {
 
     // function for loginButton
     const loginUser = async () => {
-        if (!userCredentials.email || !userCredentials.password) return toast("All fields are required");
-
+        if (!userCredentials.email || !userCredentials.password) return toast.error("All fields are required");
         const response = await userAuthentication({ ...userCredentials })
-        // console.log(response.userId);
-
         if (response.success) {
             localStorage.setItem("token", response.token)
             localStorage.setItem("userName", response.userName)
             localStorage.setItem("userId",response.userId)
             login()
             navigate("/dashBoard")
-            return toast("Login Successfull..")
+            return toast.success("Login Successfull..")
         }
-
     }
-
-
 
     return (
         <main className={styles.main}>

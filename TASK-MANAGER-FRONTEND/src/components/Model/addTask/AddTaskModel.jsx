@@ -104,17 +104,17 @@ const AddTaskModel = ({ reloadBoard }) => {
 
     const saveTask = async () => {
         try {
-            const response = await createTask(title, selectPriority, checkList, taskList, dueDate)
+            const response = await createTask({title, selectPriority, checkList, taskList, dueDate})
             if (response.data.success = "true") {
                 setIsAddTaskActive(false)
                 reloadBoard()
-                toast(response.data.message)
+                toast.success(response.data.message)
             }
         } catch (error) {
             console.log("error", error);
-            if (error.response.data.errorMessage === "Bad Request") return toast("please fill mandatory fields");
-            if (error.response.data.errorMessage === "Error in creating job!!") return toast("Error in creating job!!");
-            if (error.response.data.errorMessage === "Internal Server Error") return toast("Internal Server Error");
+            if (error.response.data.errorMessage === "Bad Request") return toast.error("please fill mandatory fields");
+            if (error.response.data.errorMessage === "Error in creating job!!") return toast.error("Error in creating job!!");
+            if (error.response.data.errorMessage === "Internal Server Error") return toast.error("Internal Server Error");
         }
     }
 

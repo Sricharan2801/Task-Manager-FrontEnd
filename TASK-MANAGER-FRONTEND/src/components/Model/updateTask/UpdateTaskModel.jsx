@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import styles from "./updateTask.module.css"
 import { editTask } from '../../../API/tasks'
+import { editBacklogTask } from '../../../API/backlogTasks'
+import { editInprogressTask } from '../../../API/inProgressTask'
+import { editDoneTask } from '../../../API/doneTasks'
 import { useAuth } from '../../../contexts/AuthContext'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
@@ -12,7 +15,8 @@ import deleteIcon from "../../../assets/icons/deleteIcon.png"
 import toast from 'react-hot-toast'
 
 
-const UpdateTaskModel = ({ taskDetails,taskId,reloadBoard }) => {
+const UpdateTaskModel = ({ taskDetails, taskId, reloadBoard, backlogTasks,
+    inProgress, doneTasks }) => {
     // states for number of tasks present & no.of tasks selected
     const [totalTasks, setTotalTasks] = useState(0)
     const [selectedTasks, setSelectedTasks] = useState(0)
@@ -29,34 +33,34 @@ const UpdateTaskModel = ({ taskDetails,taskId,reloadBoard }) => {
     const [showCalendar, setShowCalendar] = useState(false)
 
     // to control the model
-    const { setIsUpdateTaskActive } = useAuth()
+    const { setIsUpdateTaskActive, isTodo, isBacklog, isInProgress, isDone } = useAuth()
 
     useEffect(() => {
-        const taskToUpdate = taskDetails.find(task => task._id === taskId);
-        console.log(taskToUpdate);
-      
+        let taskToUpdate;
+        if (isBacklog) taskToUpdate = backlogTasks.find(task => task._id === taskId);
+        if (isTodo) taskToUpdate = taskDetails.find(task => task._id === taskId);
+        if (isInProgress) taskToUpdate = inProgress.find(task => task._id === taskId)
+        if (isDone) taskToUpdate = doneTasks.find(task => task._id === taskId)
+
         if (taskToUpdate) {
-          setTitle(taskToUpdate.title || "");
-          setSelectPriority(taskToUpdate.selectPriority || "");
-          setDueDate(taskToUpdate.dueDate || "");
-      
-          // If checkList is present, set the totalTasks count and initialize the taskInputs state with the appropriate length
-          if (taskToUpdate.checkList) {
-            setTotalTasks(taskToUpdate.checkList.length);
-            setTaskInputs(taskToUpdate.checkList.map((_, index) => ({ id: index + 1 })));
-      
-            // Set the checkList and selectedTasks count based on the data
-            setCheckList(taskToUpdate.checkList);
-            const selectedTasksCount = taskToUpdate.checkList.filter(item => item).length;
-            setSelectedTasks(selectedTasksCount);
-          }
-      
-          // If taskList is present, set the taskList state with the data
-          if (taskToUpdate.taskList) {
-            setTaskList(taskToUpdate.taskList);
-          }
+            setTitle(taskToUpdate.title || "");
+            setSelectPriority(taskToUpdate.selectPriority || "");
+            setDueDate(taskToUpdate.dueDate || "");
+
+            if (taskToUpdate.checkList) {
+                setTotalTasks(taskToUpdate.checkList.length);
+                setTaskInputs(taskToUpdate.checkList.map((_, index) => ({ id: index + 1 })));
+
+                setCheckList(taskToUpdate.checkList);
+                const selectedTasksCount = taskToUpdate.checkList.filter(item => item).length;
+                setSelectedTasks(selectedTasksCount);
+            }
+
+            if (taskToUpdate.taskList) {
+                setTaskList(taskToUpdate.taskList);
+            }
         }
-      }, [taskDetails, taskId]);
+    }, [taskDetails, taskId]);
 
 
     const addTaskInput = () => {
@@ -131,13 +135,34 @@ const UpdateTaskModel = ({ taskDetails,taskId,reloadBoard }) => {
 
     const saveTask = async () => {
         try {
-            const response = await editTask(taskId,title,selectPriority,
-                checkList,taskList,dueDate)
-            if (response.data.success === true) {
-                setIsUpdateTaskActive(false)
-                reloadBoard()
-                toast(response.data.message)
+            const payLoad = {
+                title: title, selectPriority: selectPriority,
+                checkList: checkList, taskList: taskList, dueDate: dueDate
             }
+            const handleSuccess = (response) => {
+                if (response.data.success === true) {
+                    setIsUpdateTaskActive(false)
+                    reloadBoard()
+                    toast.success(response.data.message)
+                }
+            }
+            if (isTodo) {
+                const response = await editTask(taskId, payLoad)
+                handleSuccess(response)
+            }
+            if (isBacklog) {
+                const response = await editBacklogTask(taskId, payLoad)
+                handleSuccess(response)
+            }
+            if (isInProgress) {
+                const response = await editInprogressTask(taskId, payLoad)
+                handleSuccess(response)
+            }
+            if (isDone) {
+                const response = await editDoneTask(taskId, payLoad)
+                handleSuccess(response)
+            }
+
         } catch (error) {
             console.log("error", error);
             if (error.response.data.errorMessage === "Bad Request") return toast("please fill mandatory fields");

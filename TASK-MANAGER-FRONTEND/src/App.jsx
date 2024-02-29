@@ -10,6 +10,7 @@ import Board from './components/DashboardComponents/rightSection/boardComponnet/
 import Settings from './components/DashboardComponents/rightSection/settingsComponnet/Settings';
 import Analytics from './components/DashboardComponents/rightSection/analyticsComponent/Analytics';
 import PageNotFound from './components/PageNotFound';
+import ShareTask from './components/DashboardComponents/rightSection/shareComponent/ShareTask';
 
 
 const App = () => {
@@ -22,10 +23,10 @@ const App = () => {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/dashBoard' element={<ProtectedRoute Component={DashboardPage} />} >
           <Route path="" element={<Board />} />
-          
           <Route path='settings' element={<Settings />} />
           <Route path='analytics' element={<Analytics/>}/>
         </Route>
+        <Route path='/share/:taskId' element={<ShareTask/>}/>
         <Route path='*' element={<PageNotFound/>}/>
       </Routes>
       <Toaster />

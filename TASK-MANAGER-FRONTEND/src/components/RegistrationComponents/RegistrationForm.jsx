@@ -37,16 +37,22 @@ const RegistrationForm = () => {
     }
 
     const submitForm = async () => {
-
         if (!userDetails.name || !userDetails.email ||
             !userDetails.password || !userDetails.confirmPassword) {
-            return toast("All fields are required")
+            return toast.error("All fields are required")
         }
-
         const response = await userRegistration({ ...userDetails })
-
-        console.log(response);
-
+        if(response.success === true){
+            toast.success("Registration Successfull")
+            setUserDetails({
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: ""
+              });
+              navigate("/login")
+            
+        }
     }
 
     return (

@@ -35,7 +35,6 @@ body.active-modal {
     border-radius: 3px;
     width: 50%;
     height: 70%;
-    /* min-width: 300px; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -76,8 +75,6 @@ body.active-modal {
 .priorityContainer {
     width: 100%;
     height: 13%;
-    /* background-color: rgb(10, 12, 128); */
-    /* margin-top: 1rem; */
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -105,7 +102,6 @@ body.active-modal {
 .checkListContainer {
     width: 100%;
     height: 60%;
-    /* background-color: bisque; */
     display: flex;
     flex-direction: column;
     gap: 1%;
@@ -114,25 +110,21 @@ body.active-modal {
 
 .checkListContainer::-webkit-scrollbar {
     width: 10px;
-    /* Width of the scrollbar */
 }
 
 .checkListContainer::-webkit-scrollbar-track {
     background-color:transparent;
-    /* Track color */
 }
 
 .checkListContainer::-webkit-scrollbar-thumb {
     background-color: rgba(156, 183, 197, 1);
-    /* Thumb color */
     border-radius: 10px;
-    /* Roundness of the thumb */
+
 }
 
 .taskInputContainer {
     width: 96%;
     min-height: 2rem;
-    /* background-color: aqua; */
     border: 1px solid rgba(226, 226, 226, 1);
     border-radius: 12px;
     display: flex;
@@ -186,7 +178,6 @@ body.active-modal {
 .buttonsContainer {
     width: 100%;
     height: 12%;
-    /* background-color: rgb(159, 103, 18); */
     display: flex;
     justify-content: space-between;
     align-items: center;

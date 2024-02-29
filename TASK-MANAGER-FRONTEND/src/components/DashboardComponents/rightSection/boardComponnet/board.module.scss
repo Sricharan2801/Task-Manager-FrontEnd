@@ -180,8 +180,6 @@
                     }
                 }
 
-                // fjd
-
                 .title {
                     width: 90%;
                     font-family: poppins;
@@ -233,14 +231,12 @@
 
 
                             .checkBox {
-
                                 width: 16px;
                                 height: 16px;
                                 border: 2px solid rgba(226, 226, 226, 1);
                                 border-radius: 4px;
                                 outline: none;
                                 cursor: pointer;
-
                             }
                         }
 
@@ -298,13 +294,11 @@
 
                 .optionsContainer {
                     position: absolute;
-                    left: 25%;
-                    bottom: 60%;
+                    left: 9.5rem;
+                    top: 1.8rem;
                     z-index: 1000;
-                    width: 6rem;
+                    width: 6.5rem;
                     height: 6rem;
-                    // margin-left: 12%;
-                    // margin-top: 2.2%;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-around;

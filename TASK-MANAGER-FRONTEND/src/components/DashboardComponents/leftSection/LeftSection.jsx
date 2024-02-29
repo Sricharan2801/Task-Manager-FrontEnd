@@ -14,33 +14,9 @@ const LeftSection = () => {
     const [elements, setElements] = useState({
         board: true, analytics: false, settings: false
     })
-    const [boardBgColor, setboardBgColor] = useState("");
-    const [analyticsBgColor, setAnalyticsBgColor] = useState("");
-    const [settingsBgColor, setSettingsBgColor] = useState("");
     
-
     const { setIsModelActive,isModelActive } = useAuth()
     const navigate = useNavigate()
-
-    // useEffect to handle the states 
-    useEffect(() => {
-        if (elements.board) {
-            setboardBgColor("rgba(67, 145, 237, 0.1")
-            setAnalyticsBgColor("");
-            setSettingsBgColor("")
-        }
-        if (elements.analytics) {
-            setAnalyticsBgColor("rgba(67, 145, 237, 0.1")
-            setboardBgColor("")
-            setSettingsBgColor("")
-        }
-        if (elements.settings) {
-            setSettingsBgColor("rgba(67, 145, 237, 0.1")
-            setAnalyticsBgColor("")
-            setboardBgColor("")
-        }
-    }, [elements])
-
 
     const clickHandler = (result) => {
         if (result === "board") {
@@ -54,7 +30,6 @@ const LeftSection = () => {
         if (result === "settings") {
             setElements({ board: false, analytics: false, settings: true })
             navigate("/dashboard/settings")
-
         }
     }
 
@@ -74,21 +49,21 @@ const LeftSection = () => {
 
                     <div className={styles.optionsContainer}>
                         <div className={styles.elements} onClick={() => clickHandler("board")}
-                            style={{ backgroundColor: boardBgColor }}>
+                            style={{ backgroundColor: elements.board? "rgba(67, 145, 237, 0.1" :""}}>
 
                             <img src={boardIcon} alt="logo" className={styles.appLogo} />
                             <p className={styles.appName}>Board</p>
                         </div>
 
                         <div className={styles.elements} onClick={() => clickHandler("analytics")}
-                            style={{ backgroundColor: analyticsBgColor }}>
+                            style={{ backgroundColor: elements.analytics? "rgba(67, 145, 237, 0.1" : "" }}>
 
                             <img src={analyticsIcon} alt="logo" className={styles.appLogo} />
                             <p className={styles.appName}>Analytics</p>
                         </div>
 
                         <div className={styles.elements} onClick={() => clickHandler("settings")}
-                            style={{ backgroundColor: settingsBgColor }}>
+                            style={{ backgroundColor: elements.settings? "rgba(67, 145, 237, 0.1" :"" }}>
 
                             <img src={settingsIcon} alt="logo" className={styles.appLogo} />
                             <p className={styles.appName}>Settings</p>

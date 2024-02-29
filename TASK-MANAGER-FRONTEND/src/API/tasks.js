@@ -2,8 +2,9 @@ import axios from "axios";
 const baseUrl = import.meta.env.VITE_BACKEND_URL
 import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
+const userId = localStorage.getItem("userId")
 
-export const createTask = async (title, selectPriority, checkList, taskList, dueDate) => {
+export const createTask = async ({title, selectPriority, checkList, taskList, dueDate}) => {
     try {
 
         const requestUrl = `${baseUrl}/postTask/createTask`
@@ -11,7 +12,8 @@ export const createTask = async (title, selectPriority, checkList, taskList, due
         const response = axios.post(requestUrl, requestPayLoad, {
             headers: {
                 'Content-Type': "application/json",
-                "Authorization": token
+                "Authorization": token,
+                "userId":userId
             }
         })
         return response
@@ -23,6 +25,23 @@ export const createTask = async (title, selectPriority, checkList, taskList, due
     }
 }
 
+export const getAllTasks = async() => {
+    try {
+        const requestUrl = `${baseUrl}/getTask/totalTasks`
+        const response = await axios.get(requestUrl,{
+            headers:{
+                'Content-Type':"application/json",
+                'Authorization':token,
+                "userId":userId
+            }
+        })
+        return response.data
+        
+    } catch (error) {
+        console.log("Something went wrong",error);
+    }
+}
+
 export const getTaskDetailsByFilter = async (duration) => {
     try {
         const requestUrl = `${baseUrl}/getTask/allTasks?duration=${duration}`
@@ -30,7 +49,8 @@ export const getTaskDetailsByFilter = async (duration) => {
         const response = await axios.get(requestUrl, {
             headers: {
                 'Content-Type': "application/json",
-                'Authorization': token
+                'Authorization': token,
+                "userId":userId
             }
         })
         return response.data
@@ -40,35 +60,54 @@ export const getTaskDetailsByFilter = async (duration) => {
     }
 }
 
-export const deleteTask = async(taskId)=>{
+export const getTaskById = async (taskId) => {
     try {
-        const requestUrl = `${baseUrl}/deleteTask/${taskId}`
-        const response = await axios.delete(requestUrl,{
+        const requestUrl = `${baseUrl}/getTask/task/${taskId}`
+        const response = await axios.get(requestUrl,{
             headers:{
                 'Content-Type':"application/json",
-                "Authorization":token
+                'Authorization':token,
+                "userId":userId
             }
         })
         return response.data
-        
+
     } catch (error) {
         console.log("something went wrong", error);
     }
 }
 
-export const editTask = async(taskId,title, selectPriority, checkList, taskList, dueDate)=>{
+export const deleteTask = async (taskId) => {
+    try {
+        const requestUrl = `${baseUrl}/deleteTask/${taskId}`
+        const response = await axios.delete(requestUrl, {
+            headers: {
+                'Content-Type': "application/json",
+                "Authorization": token,
+                "userId":userId
+            }
+        })
+        return response.data
+
+    } catch (error) {
+        console.log("something went wrong", error);
+    }
+}
+
+export const editTask = async (taskId, {title, selectPriority, checkList, taskList, dueDate}) => {
     try {
         const requestUrl = `${baseUrl}/updateTask/edit/${taskId}`
-        const requestPayLoad = {title,selectPriority,checkList,taskList,dueDate}
-        const response = await axios.patch(requestUrl,requestPayLoad,{
-            headers:{
-                'Content-Type':"application/json",
-                'Authorization':token
+        const requestPayLoad = { title, selectPriority, checkList, taskList, dueDate }
+        const response = await axios.patch(requestUrl, requestPayLoad, {
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': token,
+                "userId":userId
             }
         })
         return response
-        
+
     } catch (error) {
-        console.log("Someting went wrong".error);
+        console.log("Someting went wrong",error);
     }
 }

@@ -36,7 +36,12 @@ const Settings = () => {
     e.preventDefault()
    const response = await updateUserData({...details})
    console.log(response);
-   if(response.message === "Updated Successfully") return toast("Updated Successfully")
+   if(response.success = true){
+    setDetails({
+      password:"",newPassword:""
+    })
+   }
+   if(response.message === "Updated Successfully") return toast.success("Updated Successfully")
   }
   
 

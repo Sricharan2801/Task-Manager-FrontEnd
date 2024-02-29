@@ -1,29 +1,37 @@
 import React, { useState } from 'react'
 import styles from "./deleteTask.module.css"
 import { deleteTask } from '../../../API/tasks'
+import { removeBacklogTask } from '../../../API/backlogTasks'
+import { removeInProgressTask } from '../../../API/inProgressTask'
+import { removeDoneTask } from '../../../API/doneTasks'
 import { useAuth } from '../../../contexts/AuthContext'
 import toast from 'react-hot-toast'
 
 
 const DeleteTaskModel = ({ taskId, taskDetails, setTaskDetails }) => {
 
-
-    const { setIsDeleteModel } = useAuth()
+    const { setIsDeleteModel, isTodo, isBacklog, isInProgress, isDone  } = useAuth()
 
     const toggleModal = async (input) => {
         if (input === "cancel") {
             setIsDeleteModel(false)
         }
+
         if (input === "delete") {
             try {
-                const response = await deleteTask(taskId)
+                let response;
+                if(isTodo) response = await deleteTask(taskId)
+                if(isBacklog) response = await removeBacklogTask(taskId)
+                if(isInProgress) response = await removeInProgressTask(taskId)
+                if(isDone) response = await removeDoneTask(taskId)
+
                 if(response.success === true){
-                    toast(response.message)
+                    toast.success(response.message)
                     const updatedTasks = taskDetails.filter(task => task._id != taskId);
                     setTaskDetails(updatedTasks)
                 }
             } catch (error) {
-                toast("Error in deleting Task")
+                toast.error("Error in deleting Task")
             }
             setIsDeleteModel(false)
         }
