@@ -24,7 +24,7 @@ export const userRegistration = async ({ name, email, password, confirmPassword 
 export const userAuthentication = async ({ email, password }) => {
 
     try {
-        const requestUrl = `${baseUrl}/authentication/signIn`
+        const requestUrl = "http://localhost:9000/api/v1/authentication/signIn"
         const requestPayLoad = { email, password }
 
         const response = await axios.post(requestUrl, requestPayLoad)
