@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "https://task-manager-fkf6.onrender.com";
+const baseUrl = import.meta.env.VITE_BACKEND_URL
 import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
 const userId = localStorage.getItem("userId")
@@ -22,9 +22,9 @@ export const createBacklogTask = async ({ title, selectPriority, checkList, task
     }
 }
 
-export const getAllBacklogTasks = async () => {
+export const getAllBacklogTasks = async (duration) => {
     try {
-        const requestUrl = `${baseUrl}/backlogTasks/allTasks`
+        const requestUrl = `${baseUrl}/backlogTasks/allTasks/?duration=${duration}`
         const response = await axios.get(requestUrl, {
             headers: {
                 'Content-Type': "application/json",

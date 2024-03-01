@@ -6,6 +6,7 @@ import RightSection from './rightSection/RightSection'
 
 const DashBoardComponnet = () => {
 
+    
     return (
         <main className={styles.main}>
 

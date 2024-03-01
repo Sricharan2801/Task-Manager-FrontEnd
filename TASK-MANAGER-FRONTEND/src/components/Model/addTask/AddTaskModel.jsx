@@ -104,7 +104,7 @@ const AddTaskModel = ({ reloadBoard }) => {
 
     const saveTask = async () => {
         try {
-            const response = await createTask({title, selectPriority, checkList, taskList, dueDate})
+            const response = await createTask({ title, selectPriority, checkList, taskList, dueDate })
             if (response.data.success = "true") {
                 setIsAddTaskActive(false)
                 reloadBoard()

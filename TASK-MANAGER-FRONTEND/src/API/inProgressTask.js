@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "https://task-manager-fkf6.onrender.com";
+const baseUrl = import.meta.env.VITE_BACKEND_URL
 import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
 const userId = localStorage.getItem("userId")
@@ -21,9 +21,9 @@ export const createInProgressTask = async ({ title, selectPriority, checkList, t
     }
 }
 
-export const getAllInProgressTasks = async () => {
+export const getAllInProgressTasks = async (duration) => {
     try {
-        const requestUrl = `${baseUrl}/inProgressTasks/allTasks`
+        const requestUrl = `${baseUrl}/inProgressTasks/allTasks/?duration=${duration}`
         const response = await axios.get(requestUrl, {
             headers: {
                 'Content-Type': "application/json",

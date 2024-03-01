@@ -12,23 +12,27 @@ import Model from "../../Model/logout/Model"
 
 const LeftSection = () => {
     const [elements, setElements] = useState({
-        board: true, analytics: false, settings: false
+        board:true, 
+        analytics:false, 
+        settings:false
     })
     
+
+
     const { setIsModelActive,isModelActive } = useAuth()
     const navigate = useNavigate()
 
     const clickHandler = (result) => {
         if (result === "board") {
-            setElements({ board: true, analytics: false, settings: false })
+            setElements(prev => ({...prev,board:true}))
             navigate("/dashboard")
         }
         if (result === "analytics") {
-            setElements({ board: false, analytics: true, settings: false })
+            setElements(prev => ({...prev,analytics:true}))
             navigate("/dashboard/analytics")
         }
         if (result === "settings") {
-            setElements({ board: false, analytics: false, settings: true })
+            setElements(prev => ({...prev,settings:true}))
             navigate("/dashboard/settings")
         }
     }

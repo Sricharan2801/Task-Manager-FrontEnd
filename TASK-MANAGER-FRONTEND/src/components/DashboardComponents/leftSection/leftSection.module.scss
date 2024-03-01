@@ -1,3 +1,9 @@
+@mixin poppins-font{
+    font-family: poppins;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
 .main {
     width: 100%;
     height: 100%;
@@ -19,9 +25,9 @@
                 width: 100%;
                 height: 25%;
                 display: flex;
-                gap: 5%;
                 justify-content: center;
                 align-items: center;
+                gap: 5%;
 
                 .appLogo {
                     width: 15%;
@@ -44,8 +50,8 @@
                     width: 100%;
                     height: 25%;
                     display: flex;
-                    gap: 5%;
                     align-items: center;
+                    gap: 5%;
                     cursor: pointer;
                 }
 
@@ -59,9 +65,7 @@
                 }
 
                 .appName {
-                    font-family: poppins;
-                    font-size: 1.1rem;
-                    font-weight: 500;
+                    @include poppins-font();
                 }
             }
         }
@@ -80,9 +84,7 @@
             }
 
             .text {
-                font-family: poppins;
-                font-size: 1.1rem;
-                font-weight: 500;
+              @include poppins-font();
             }
         }
     }

@@ -60,12 +60,12 @@ const RegistrationForm = () => {
 
             <section className={styles.leftSection}>
                 <img src={RegistrationPageImage} alt="Image" className={styles.image} />
-                <p className={styles.caption}>Welcome aboard my friend
-                    <div className={styles.internalText}> just a couple of clicks and we start</div></p>
+                <div className={styles.caption}>Welcome aboard my friend
+                    <div className={styles.internalText}> just a couple of clicks and we start</div></div>
             </section>
 
             <section className={styles.rightSection}>
-                <p className={styles.heading}>Register</p>
+                <div className={styles.heading}>Register</div>
 
                 <form action="" className={styles.form}>
                     <div className={styles.fieldsContainer}>
@@ -77,6 +77,7 @@ const RegistrationForm = () => {
                             name='name'
                             value={userDetails.name}
                             onChange={changeHandler}
+                            autoComplete="new-password"
                         />
                     </div>
 
@@ -89,6 +90,7 @@ const RegistrationForm = () => {
                             name='email'
                             value={userDetails.email}
                             onChange={changeHandler}
+                            autoComplete="new-password"
                         />
                     </div>
 
@@ -101,7 +103,8 @@ const RegistrationForm = () => {
                             className={styles.formFields}
                             name='password'
                             value={userDetails.password}
-                            onChange={changeHandler} />
+                            onChange={changeHandler} 
+                            autoComplete="new-password"/>
 
                         <img src={viewIcon} alt="eyeIcon"
                             className={styles.icon}
@@ -116,7 +119,8 @@ const RegistrationForm = () => {
                             className={styles.formFields}
                             name='confirmPassword'
                             value={userDetails.confirmPassword}
-                            onChange={changeHandler} />
+                            onChange={changeHandler} 
+                            autoComplete="new-password"/>
 
                         <img src={viewIcon} alt="eyeIcon"
                             className={styles.icon}

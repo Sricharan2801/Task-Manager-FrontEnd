@@ -14,14 +14,18 @@ export const AuthProvider = ({ children }) => {
     const [isDeleteModel, setIsDeleteModel] = useState(false)
     const [isUpdateTaskActive, setIsUpdateTaskActive] = useState(false)
 
-    const [isTodo,setIsTodo] = useState(false)
-    const [isBacklog,setIsBacklog] =useState(false)
-    const [isInProgress,setIsInProgress] = useState(false)
-    const [isDone,setIsDone] = useState(false)
+    const [isTodo, setIsTodo] = useState(false)
+    const [isBacklog, setIsBacklog] = useState(false)
+    const [isInProgress, setIsInProgress] = useState(false)
+    const [isDone, setIsDone] = useState(false)
 
 
     const login = () => {
         setIsLoggedIn(true)
+        setTimeout(() => {
+            window.location.reload()
+        },500)
+
     }
 
     const logout = () => {
@@ -35,13 +39,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("userId")
     }
 
-  
+
     return <AuthContext.Provider value={{
         isLoggedIn, login, logout, isModelActive, setIsModelActive,
         isAddTaskActive, setIsAddTaskActive, isDeleteModel, setIsDeleteModel,
         isUpdateTaskActive, setIsUpdateTaskActive,
-        setIsTodo,setIsBacklog,setIsInProgress,setIsDone,isTodo,isBacklog,isInProgress,isDone
-       
+        setIsTodo, setIsBacklog, setIsInProgress, setIsDone, isTodo, isBacklog, isInProgress, isDone
+
 
 
     }}>

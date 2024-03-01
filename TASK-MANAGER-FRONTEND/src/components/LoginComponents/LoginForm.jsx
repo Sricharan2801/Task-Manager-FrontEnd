@@ -39,7 +39,7 @@ const LoginForm = () => {
         if (response.success) {
             localStorage.setItem("token", response.token)
             localStorage.setItem("userName", response.userName)
-            localStorage.setItem("userId",response.userId)
+            localStorage.setItem("userId", response.userId)
             login()
             navigate("/dashBoard")
             return toast.success("Login Successfull..")
@@ -50,13 +50,13 @@ const LoginForm = () => {
         <main className={styles.main}>
             <section className={styles.leftSection}>
                 <img src={RegistrationPageImage} alt="Image" className={styles.image} />
-                <p className={styles.caption}>Welcome aboard my friend
-                    <div className={styles.internalText}> just a couple of clicks and we start</div></p>
-                <p></p>
+                <div className={styles.caption}>Welcome aboard my friend
+                    <div className={styles.internalText}> just a couple of clicks and we start</div>
+                </div>
             </section>
 
             <section className={styles.rightSection}>
-                <p className={styles.heading}>Login</p>
+                <div className={styles.heading}>Login</div>
 
                 <form action="" className={styles.form}>
 
@@ -68,7 +68,8 @@ const LoginForm = () => {
                             className={styles.formFields}
                             name='email'
                             value={userCredentials.email}
-                            onChange={changeHandler} />
+                            onChange={changeHandler} 
+                            autoComplete="new-password"/>
 
                     </div>
 
@@ -81,7 +82,7 @@ const LoginForm = () => {
                             name='password'
                             value={userCredentials.password}
                             onChange={changeHandler}
-
+                            autoComplete="new-password"
                         />
 
                         <img src={viewIcon} alt="eyeIcon"

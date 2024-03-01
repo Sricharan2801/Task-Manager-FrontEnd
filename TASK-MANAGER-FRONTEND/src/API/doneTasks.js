@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "https://task-manager-fkf6.onrender.com";
+const baseUrl = import.meta.env.VITE_BACKEND_URL
 import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
 const userId = localStorage.getItem("userId")
@@ -22,9 +22,9 @@ export const createDoneTask = async ({ title, selectPriority, checkList, taskLis
     }
 }
 
-export const getAllDoneTasks = async () => {
+export const getAllDoneTasks = async (duration) => {
     try {
-        const requestUrl = `${baseUrl}/doneTasks/allTasks`
+        const requestUrl = `${baseUrl}/doneTasks/allTasks/?duration=${duration}`
         const response = await axios.get(requestUrl, {
             headers: {
                 'Content-Type': "application/json",
@@ -65,8 +65,6 @@ export const removeDoneTask = async(taskId)=>{
             }
         })
         return response.data
-
-        
     } catch (error) {
         console.log("Something went wrong");
     }
@@ -85,7 +83,6 @@ export const editDoneTask = async (taskId, {title, selectPriority, checkList,
             }
         })
         return response
-
     } catch (error) {
         console.log("Something went wrong in edit backlog");
     }

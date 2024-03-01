@@ -20,7 +20,6 @@ const UpdateTaskModel = ({ taskDetails, taskId, reloadBoard, backlogTasks,
     // states for number of tasks present & no.of tasks selected
     const [totalTasks, setTotalTasks] = useState(0)
     const [selectedTasks, setSelectedTasks] = useState(0)
-
     // state for number of inputs
     const [taskInputs, setTaskInputs] = useState([])
 
@@ -34,13 +33,13 @@ const UpdateTaskModel = ({ taskDetails, taskId, reloadBoard, backlogTasks,
 
     // to control the model
     const { setIsUpdateTaskActive, isTodo, isBacklog, isInProgress, isDone } = useAuth()
-
     useEffect(() => {
         let taskToUpdate;
         if (isBacklog) taskToUpdate = backlogTasks.find(task => task._id === taskId);
         if (isTodo) taskToUpdate = taskDetails.find(task => task._id === taskId);
         if (isInProgress) taskToUpdate = inProgress.find(task => task._id === taskId)
         if (isDone) taskToUpdate = doneTasks.find(task => task._id === taskId)
+
 
         if (taskToUpdate) {
             setTitle(taskToUpdate.title || "");

@@ -1,7 +1,28 @@
+@mixin flex-end {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+@mixin flex-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin font-poppins {
+    font-family: poppins;
+    font-weight: 500;
+}
+
 .main {
     width: 80vw;
     height: 100%;
-
 
     .header {
         width: 100%;
@@ -23,12 +44,11 @@
             }
 
             .text {
-                font-family: Poppins;
-                font-weight: 500;
-                font-size: 1.3rem;
                 width: 100%;
                 height: 60%;
                 padding-left: 5%;
+                @include font-poppins();
+                font-size: 1.3rem;
                 display: flex;
                 align-items: flex-end;
             }
@@ -42,28 +62,22 @@
                 width: 100%;
                 height: 40%;
                 color: rgba(112, 112, 112, 1);
-                font-family: poppins;
-                font-weight: 500;
-                font-size: 1rem;
-                display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
                 padding-right: 8%;
+                @include font-poppins();
+                font-size: 1rem;
+                @include flex-end();
             }
 
             .filter {
                 width: 100%;
                 height: 60%;
-                display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
                 padding-right: 8%;
+                @include flex-end();
 
                 .dropDown {
                     outline: none;
                     border: none;
-                    font-family: poppins;
-                    font-weight: 500;
+                    @include font-poppins();
                     font-size: 0.9rem;
                 }
             }
@@ -82,7 +96,7 @@
         padding-right: 10px;
 
         &::-webkit-scrollbar {
-            height: 0.8rem;
+            height: 0.7rem;
         }
 
         &::-webkit-scrollbar-track {
@@ -96,8 +110,7 @@
             background-color: rgba(238, 242, 245, 1);
             flex-shrink: 0;
             border-radius: 10px;
-            display: flex;
-            flex-direction: column;
+            @include flex-column();
             overflow-y: auto;
 
             &::-webkit-scrollbar {
@@ -110,20 +123,17 @@
                 border-radius: 10px;
             }
 
-
             .fieldsContainer {
                 width: 90%;
                 height: 10%;
-                display: flex;
-                align-items: center;
+                @include flex-row();
                 justify-content: space-between;
                 padding-left: 10%;
                 margin-top: 2%;
 
                 .taskName {
-                    font-family: poppins;
+                    @include font-poppins();
                     font-size: 1rem;
-                    font-weight: 500;
                 }
 
                 .icon {
@@ -146,20 +156,18 @@
             .taskCard {
                 width: 90%;
                 margin-left: 5%;
+                margin-top: 1rem;
                 background-color: rgba(255, 255, 255, 1);
                 border-radius: 20px;
-                display: flex;
-                flex-direction: column;
+                @include flex-column();
                 align-items: center;
-                margin-top: 1rem;
                 gap: 0.5rem;
 
                 .priorityContainer {
                     width: 90%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
                     margin-top: 1rem;
+                    @include flex-row();
+                    justify-content: space-between;
 
                     .priority {
                         width: 50%;
@@ -168,9 +176,8 @@
                         gap: 0.2rem;
 
                         .priorityName {
-                            font-family: poppins;
+                            @include font-poppins();
                             font-size: 0.7rem;
-                            font-weight: 500;
                             color: rgba(112, 112, 112, 1);
                         }
                     }
@@ -188,16 +195,13 @@
                 .checkListContainer {
                     width: 90%;
                     font-family: Inter;
-                    display: flex;
-                    flex-direction: column;
+                    @include flex-column();
                     gap: 0.8em;
 
                     .headingAndExpansionBtn {
                         width: 100%;
-                        display: flex;
-                        align-items: center;
+                        @include flex-row();
                         justify-content: space-between;
-
 
                         .heading {
                             font-weight: 500;
@@ -215,20 +219,17 @@
 
                     .tasksConatiner {
                         width: 100%;
-                        display: flex;
-                        gap: 5%;
                         border: 1px solid rgba(226, 226, 226, 1);
                         padding-top: 0.5rem;
                         padding-bottom: 0.5rem;
                         padding-left: 0.5rem;
                         border-radius: 12px;
+                        display: flex;
+                        gap: 5%;
 
                         .checkboxContainer {
                             width: 10%;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-
+                            @include flex-row();
 
                             .checkBox {
                                 width: 16px;
@@ -259,9 +260,7 @@
                             font-family: poppins;
                             font-size: 0.5rem;
                             font-weight: 500;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-row();
                         }
 
                         .empty {
@@ -271,45 +270,39 @@
                         .buttonsContainer {
                             width: 65%;
                             height: 1.5rem;
-                            display: flex;
+                            @include flex-row();
                             justify-content: space-around;
-                            align-items: center;
 
                             .contolBtns {
                                 width: 30%;
                                 height: 100%;
                                 height: 100%;
-                                font-family: poppins;
+                                @include font-poppins();
                                 font-size: 0.5rem;
-                                font-weight: 500;
                                 color: rgba(118, 117, 117, 1);
                                 background-color: rgba(238, 236, 236, 1);
                                 border-radius: 8px;
                             }
                         }
-
-
                     }
                 }
 
                 .optionsContainer {
+                    width: 6.5rem;
+                    height: 6rem;
                     position: absolute;
                     left: 9.5rem;
                     top: 1.8rem;
                     z-index: 1000;
-                    width: 6.5rem;
-                    height: 6rem;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
                     background-color: white;
                     box-shadow: 0px 2px 22px 0px rgba(126, 122, 122, 0.25);
                     border-radius: 12px;
-
+                    @include flex-column();
+                    justify-content: space-around;
+                   
                     .options {
-                        font-family: poppins;
+                       @include font-poppins();
                         font-size: 0.8rem;
-                        font-weight: 500;
                         padding-left: 15%;
                         cursor: pointer;
                     }
@@ -318,10 +311,7 @@
                         color: rgba(207, 54, 54, 1);
                     }
                 }
-
             }
-
-
         }
     }
 }

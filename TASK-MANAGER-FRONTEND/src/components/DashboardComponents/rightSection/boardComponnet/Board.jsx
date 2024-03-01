@@ -27,6 +27,7 @@ const Board = () => {
   const [inProgress, setInProgress] = useState([])
   const [doneTasks, setDoneTasks] = useState([])
 
+
   const [priority, setPriority] = useState([])
   const [backlogPriority, setBackLogPriority] = useState([])
   const [inProgressPriority, setInProgressPriority] = useState([])
@@ -43,7 +44,7 @@ const Board = () => {
   const [inProgressIsChecked, setInProgressIsChecked] = useState([])
   const [inProgressTotalLists, setInProgressTotalLists] = useState(0)
   const [inProgressSelected, setInProgressSelected] = useState(0)
-  
+
   const [doneIsChecked, setDoneIsChecked] = useState([])
   const [doneTotalTasks, setDoneTotalTasks] = useState(0)
   const [doneSelectedTasks, setDoneSelectedTasks] = useState(0)
@@ -63,12 +64,13 @@ const Board = () => {
 
   const { isAddTaskActive, setIsAddTaskActive,
     isModelActive, isDeleteModel, setIsDeleteModel, isUpdateTaskActive,
-    setIsUpdateTaskActive, setIsTodo, setIsBacklog, setIsInProgress, setIsDone} = useAuth()
+    setIsUpdateTaskActive, setIsTodo, setIsBacklog, setIsInProgress, setIsDone } = useAuth()
 
   const userName = localStorage.getItem('userName');
   const currentDate = new Date();
   const formattedDate = format(currentDate, 'do MMM, yyyy');
   let formattedDueDate;
+
 
   useEffect(() => {
     getBacklogDetails()
@@ -76,9 +78,13 @@ const Board = () => {
     getDoneTaskDetails()
   }, [taskDetails])
 
+
   // fetching tasks by filter
   useEffect(() => {
     fetchingDetailsByFilter()
+    getDoneTaskDetails()
+    getAllBacklogTasks()
+    getInProgressdetails()
   }, [duration]);
 
   useEffect(() => {
@@ -139,15 +145,17 @@ const Board = () => {
   useEffect(() => {
     const todoDeadline = updateDeadLine(taskDetails)
     setIsDeadLineCompleted(todoDeadline);
-
-    const progressDeadLine = updateDeadLine(inProgress)
-    setProgressTaskDeadLine(progressDeadLine)
   }, [taskDetails])
 
   useEffect(() => {
     const backlogDeadLine = updateDeadLine(backlogTasks)
     setBacklogTaskDeadLine(backlogDeadLine)
   }, [backlogTasks])
+
+  useEffect(() => {
+    const setInprogressDeadLine = updateDeadLine(inProgress)
+    setProgressTaskDeadLine(setInprogressDeadLine)
+  }, [inProgress])
 
   const setPriorityIcons = (tasks) => {
     return tasks.map(task => {
@@ -369,18 +377,28 @@ const Board = () => {
       }
     })
   }
+
+
+  const handleClickedContainer = (input1, input2, input3, input4) => {
+    setIsTodo(input1)
+    setIsInProgress(input2)
+    setIsBacklog(input3)
+    setIsDone(input4)
+  }
+
+  const handleLocalStorage = (input1, input2, input3, input4) => {
+    localStorage.setItem("isTodo", input1)
+    localStorage.setItem("isInProgress", input2)
+    localStorage.setItem("isBacklog", input3)
+    localStorage.setItem("isDone", input4)
+  }
+
   // function handles update,delete and sharing of a task
   const handleOptions = async (id, input) => {
-    setIsTodo(true)
-    setIsInProgress(false)
-    setIsBacklog(false)
-    setIsDone(false)
+    handleClickedContainer(true, false, false, false)
 
     // for share function 
-    localStorage.setItem("isTodo", "true")
-    localStorage.setItem("isInProgress", "false")
-    localStorage.setItem("isBacklog", "false")
-    localStorage.setItem("isDone", "false")
+    handleLocalStorage("true", "false", "false", "false")
     if (input === "deleteTask") {
       setTaskId(id)
       setIsDeleteModel(true)
@@ -399,14 +417,9 @@ const Board = () => {
   }
 
   const handleBacklogOptions = (id, input) => {
-    setIsTodo(false)
-    setIsInProgress(false)
-    setIsBacklog(true)
-    setIsDone(false)
-    localStorage.setItem("isTodo", "false")
-    localStorage.setItem("isInProgress", "false")
-    localStorage.setItem("isBacklog", "true")
-    localStorage.setItem("isDone", "false")
+    handleClickedContainer(false, false, true, false)
+    handleLocalStorage("false", "false", "true", "false")
+
     if (input === "deleteTask") {
       setTaskId(id)
       setIsDeleteModel(true)
@@ -425,14 +438,9 @@ const Board = () => {
   }
 
   const handlerProgressOptions = (id, input) => {
-    setIsTodo(false)
-    setIsInProgress(true)
-    setIsBacklog(false)
-    setIsDone(false)
-    localStorage.setItem("isTodo", "false")
-    localStorage.setItem("isInProgress", "true")
-    localStorage.setItem("isBacklog", "false")
-    localStorage.setItem("isDone", "false")
+    handleClickedContainer(false, true, false, false)
+    handleLocalStorage("false", "true", "false", "false")
+
     if (input === "deleteTask") {
       setTaskId(id)
       setIsDeleteModel(true)
@@ -451,14 +459,9 @@ const Board = () => {
   }
 
   const handleDoneOptions = (id, input) => {
-    setIsTodo(false)
-    setIsInProgress(false)
-    setIsBacklog(false)
-    setIsDone(true)
-    localStorage.setItem("isTodo", "false")
-    localStorage.setItem("isInProgress", "false")
-    localStorage.setItem("isBacklog", "false")
-    localStorage.setItem("isDone", "true")
+    handleClickedContainer(false, false, false, true)
+    handleLocalStorage("false", "false", "false", "true")
+
     if (input === "deleteTask") {
       setTaskId(id)
       setIsDeleteModel(true)
@@ -477,42 +480,48 @@ const Board = () => {
   }
 
   const getBacklogDetails = async () => {
-    const backlogTasks = await getAllBacklogTasks()
+    const backlogTasks = await getAllBacklogTasks(duration)
     if (Array.isArray(backlogTasks.tasks)) {
       setBacklogTasks(backlogTasks.tasks);
     } else {
-      console.log("No tasks found in the backlog or invalid response format");
       setBacklogTasks([]);
     }
   }
 
   const getInProgressdetails = async () => {
-    const inProgressTasks = await getAllInProgressTasks()
+    const inProgressTasks = await getAllInProgressTasks(duration)
     if (Array.isArray(inProgressTasks.tasks)) {
       setInProgress(inProgressTasks.tasks)
     } else {
-      console.log("No tasks found in the Inprogress or invalid response format");
       setInProgress([]);
     }
   }
 
   const getDoneTaskDetails = async () => {
-    const doneTasks = await getAllDoneTasks()
+    const doneTasks = await getAllDoneTasks(duration)
     if (Array.isArray(doneTasks.tasks)) {
       setDoneTasks(doneTasks.tasks)
     } else {
-      console.log("No tasks found in the donetasks or invalid response format");
       setInProgress([]);
     }
+  }
+
+  const commonPayLoad = (selectedTask) => {
+    const payLoad = {
+      title: selectedTask.tasks.title,
+      selectPriority: selectedTask.tasks.selectPriority,
+      checkList: selectedTask.tasks.checkList,
+      taskList: selectedTask.tasks.taskList,
+      dueDate: selectedTask.tasks.dueDate
+    }
+    return payLoad
   }
 
   // Function to move task to backlog
   const moveToBacklog = async (id, input) => {
     if (input === "todo") {
       const selectedTask = await getTaskById(id)
-      console.log(selectedTask);
-      const removeTask = await deleteTask(id)
-      console.log(removeTask);
+      await deleteTask(id)
       const payLoad = {
         title: selectedTask.taskDetails.title,
         selectPriority: selectedTask.taskDetails.selectPriority,
@@ -521,44 +530,29 @@ const Board = () => {
         dueDate: selectedTask.taskDetails.dueDate
       }
       const postTask = await createBacklogTask(payLoad)
-      console.log(postTask);
       if (postTask.data.success === true) {
-        getBacklogDetails()
+        await getBacklogDetails()
         setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id))
       }
     }
 
     if (input === "progress") {
       const selectedTask = await getInprogressTask(id)
-      const removeTask = await removeInProgressTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createBacklogTask(payLoad)
+      await removeInProgressTask(id)
+      const postTask = await createBacklogTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getBacklogDetails()
-        getInProgressdetails()
+        await getBacklogDetails()
+        await getInProgressdetails()
       }
     }
 
     if (input === "done") {
       const selectedTask = await getDoneTask(id)
       await removeDoneTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createBacklogTask(payLoad)
+      const postTask = await createBacklogTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getBacklogDetails()
-        getDoneTaskDetails()
+        await getBacklogDetails()
+        await getDoneTaskDetails()
       }
     }
   };
@@ -567,51 +561,30 @@ const Board = () => {
   const moveToToDo = async (id, input) => {
     if (input === "backLog") {
       const selectedTask = await getBacklogTask(id)
-      const removeTask = await removeBacklogTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createTask(payLoad)
+      await removeBacklogTask(id)
+      const postTask = await createTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        fetchingDetailsByFilter()
+        await fetchingDetailsByFilter()
       }
     }
 
     if (input === "progress") {
       const selectedTask = await getInprogressTask(id)
-      const removeTask = await removeInProgressTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createTask(payLoad)
+      await removeInProgressTask(id)
+      const postTask = await createTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        fetchingDetailsByFilter()
-        getInProgressdetails()
+        await fetchingDetailsByFilter()
+        await getInProgressdetails()
       }
     }
 
     if (input === "done") {
       const selectedTask = await getDoneTask(id)
       await removeDoneTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createTask(payLoad)
+      const postTask = await createTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        fetchingDetailsByFilter()
-        getDoneTaskDetails()
+        await fetchingDetailsByFilter()
+        await getDoneTaskDetails()
       }
     }
   }
@@ -620,7 +593,7 @@ const Board = () => {
   const moveToProgress = async (id, input) => {
     if (input === "todo") {
       const selectedTask = await getTaskById(id)
-      const removeTask = await deleteTask(id)
+      await deleteTask(id)
       const payLoad = {
         title: selectedTask.taskDetails.title,
         selectPriority: selectedTask.taskDetails.selectPriority,
@@ -630,43 +603,28 @@ const Board = () => {
       }
       const postTask = await createInProgressTask(payLoad)
       if (postTask.data.success === true) {
-        getInProgressdetails()
+        await getInProgressdetails()
         setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id));
       }
-
     }
 
     if (input === "backLog") {
       const selectedTask = await getBacklogTask(id)
-      const removeTask = await removeBacklogTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createInProgressTask(payLoad)
+      await removeBacklogTask(id)
+      const postTask = await createInProgressTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getInProgressdetails()
-        getBacklogDetails()
+        await getInProgressdetails()
+        await getBacklogDetails()
       }
     }
 
     if (input === "done") {
       const selectedTask = await getDoneTask(id)
       await removeDoneTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createInProgressTask(payLoad)
+      const postTask = await createInProgressTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getInProgressdetails()
-        getDoneTaskDetails()
+        await getInProgressdetails()
+        await getDoneTaskDetails()
       }
     }
   }
@@ -675,7 +633,7 @@ const Board = () => {
   const moveToDone = async (id, input) => {
     if (input === "todo") {
       const selectedTask = await getTaskById(id)
-      const removeTask = await deleteTask(id)
+      await deleteTask(id)
       const payLoad = {
         title: selectedTask.taskDetails.title,
         selectPriority: selectedTask.taskDetails.selectPriority,
@@ -685,42 +643,28 @@ const Board = () => {
       }
       const postTask = await createDoneTask(payLoad)
       if (postTask.data.success === true) {
-        getDoneTaskDetails()
+        await getDoneTaskDetails()
         setTaskDetails(prevTaskDetails => prevTaskDetails.filter(task => task._id !== id));
       }
     }
 
     if (input === "backLog") {
       const selectedTask = await getBacklogTask(id)
-      const removeTask = await removeBacklogTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createDoneTask(payLoad)
+      await removeBacklogTask(id)
+      const postTask = await createDoneTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getDoneTaskDetails()
-        getBacklogDetails()
+        await getDoneTaskDetails()
+        await getBacklogDetails()
       }
     }
 
     if (input === "progress") {
       const selectedTask = await getInprogressTask(id)
-      const removeTask = await removeInProgressTask(id)
-      const payLoad = {
-        title: selectedTask.tasks.title,
-        selectPriority: selectedTask.tasks.selectPriority,
-        checkList: selectedTask.tasks.checkList,
-        taskList: selectedTask.tasks.taskList,
-        dueDate: selectedTask.tasks.dueDate
-      }
-      const postTask = await createDoneTask(payLoad)
+      await removeInProgressTask(id)
+      const postTask = await createDoneTask(commonPayLoad(selectedTask))
       if (postTask.data.success === true) {
-        getDoneTaskDetails()
-        getInProgressdetails()
+        await getDoneTaskDetails()
+        await getInProgressdetails()
       }
     }
   }
@@ -1101,10 +1045,7 @@ const Board = () => {
           :
           <></>
       }
-
-
     </main>
   );
 };
-
 export default Board;
