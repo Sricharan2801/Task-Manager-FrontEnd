@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = import.meta.env.VITE_BACKEND_URL
+const baseUrl = " https://task-manager-hkmw.onrender.com/api/v1"
 import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
 const userId = localStorage.getItem("userId")
