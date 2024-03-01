@@ -24,15 +24,15 @@ const LeftSection = () => {
 
     const clickHandler = (result) => {
         if (result === "board") {
-            setElements(prev => ({...prev,board:true}))
+            setElements({board:true,analytics:false,settings:false})
             navigate("/dashboard")
         }
         if (result === "analytics") {
-            setElements(prev => ({...prev,analytics:true}))
+            setElements({board:false,analytics:true,settings:false})
             navigate("/dashboard/analytics")
         }
         if (result === "settings") {
-            setElements(prev => ({...prev,settings:true}))
+            setElements({board:false,analytics:false,settings:true})
             navigate("/dashboard/settings")
         }
     }

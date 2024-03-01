@@ -10,6 +10,8 @@ import lowPriorityIcon from "../../../assets/icons/lowPriorityIcon.png"
 import moderatePriorityIcon from "../../../assets/icons/moderatePriorityIcon.png"
 import deleteIcon from "../../../assets/icons/deleteIcon.png"
 import toast from 'react-hot-toast'
+const userId = localStorage.getItem("userId")
+
 
 
 const AddTaskModel = ({ reloadBoard }) => {
@@ -104,11 +106,12 @@ const AddTaskModel = ({ reloadBoard }) => {
 
     const saveTask = async () => {
         try {
-            const response = await createTask({ title, selectPriority, checkList, taskList, dueDate })
+            const response = await createTask({userId, title, selectPriority, checkList, taskList, dueDate })
             if (response.data.success = "true") {
                 setIsAddTaskActive(false)
                 reloadBoard()
                 toast.success(response.data.message)
+                
             }
         } catch (error) {
             console.log("error", error);

@@ -4,8 +4,12 @@ import toast from "react-hot-toast";
 const token = localStorage.getItem("token")
 const userId = localStorage.getItem("userId")
 
+
 export const createTask = async ({ title, selectPriority, checkList, taskList, dueDate }) => {
+   
     try {
+        console.log(userId);
+        console.log("creating Task");
         const requestUrl = `${baseUrl}/postTask/createTask`
         const requestPayLoad = { title, selectPriority, checkList, taskList, dueDate }
         const response = axios.post(requestUrl, requestPayLoad, {

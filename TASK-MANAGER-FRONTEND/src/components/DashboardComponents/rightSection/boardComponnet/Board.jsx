@@ -482,7 +482,11 @@ const Board = () => {
   const getBacklogDetails = async () => {
     const backlogTasks = await getAllBacklogTasks(duration)
     if (Array.isArray(backlogTasks.tasks)) {
-      setBacklogTasks(backlogTasks.tasks);
+     const updatedTasks  = backlogTasks.tasks.map(task => ({
+      ...task,
+      collapsed:false
+     }))
+     setBacklogTasks(updatedTasks);
     } else {
       setBacklogTasks([]);
     }
